@@ -11,7 +11,7 @@
                   v-model="requestName"
                   placeholder="Select a review request name"
                   size="large"
-                  style="width:100%;"
+                  style="width: 100%"
                 >
                   <el-option
                     v-for="(requestName, index) in requestNames"
@@ -51,33 +51,33 @@
             >
               <template #header>
                 <div class="card-header">
-                  <span class="review-title">Review #{{index + 1}} by ({{review.reviewer}})</span>
+                  <span class="review-title"
+                    >Review #{{ index + 1 }} by ({{ review.reviewer }})</span
+                  >
                 </div>
               </template>
               <div class="review-body">
-                <span style="font-weight: bolder;">Target</span><br/>
+                <span style="font-weight: bolder">Target</span><br />
                 <a
                   :href="requestObject.targets[index]"
                   target="_blank"
-                  style="text-decoration:none"
+                  style="text-decoration: none"
                 >
-                  {{ requestObject.targets[index] }}
-                </a><br/><br/>
-                <span style="font-weight: bolder;">Target IPFS Hash</span><br/>
+                  {{ requestObject.targets[index] }} </a
+                ><br /><br />
+                <span style="font-weight: bolder">Target IPFS Hash</span><br />
                 <a
                   :href="`https://ipfs.io/ipfs/${requestObject.targetsIPFSHashes[index]}`"
                   target="_blank"
-                  style="text-decoration:none"
+                  style="text-decoration: none"
                 >
-                  {{ requestObject.targetsIPFSHashes[index] }}
-                </a><br/><br/><br/>
-                <div
-                  v-for="(question, index) in reviewForm[0]"
-                  :key="index"
-                >
-                  <span style="font-weight: bolder;">{{ question }}</span><br/>
+                  {{ requestObject.targetsIPFSHashes[index] }} </a
+                ><br /><br /><br />
+                <div v-for="(question, index) in reviewForm[0]" :key="index">
+                  <span style="font-weight: bolder">{{ question }}</span
+                  ><br />
                   {{ review.answers[index] }}
-                  <br/><br/>
+                  <br /><br />
                 </div>
               </div>
             </el-card>
@@ -94,56 +94,54 @@
           <h2>Review Request</h2>
           <el-card class="review-card" shadow="hover">
             <div class="review-body">
-              <span style="font-weight: bolder;">Reviewers</span><br/>
+              <span style="font-weight: bolder">Reviewers</span><br />
               <div
                 v-for="(reviewer, index) in requestObject.reviewers"
-                :key=index
+                :key="index"
               >
-                {{reviewer}}<br/>
+                {{ reviewer }}<br />
               </div>
-              <br/><br/>
-              <span style="font-weight: bolder;">Targets</span><br/><br/>
+              <br /><br />
+              <span style="font-weight: bolder">Targets</span><br /><br />
               <div
                 v-for="(target, index) in requestObject.targets"
-                :key=index
+                :key="index"
               >
-                <span style="font-weight:bolder;">Target {{index +1}}</span><br/>
-                <a
-                  :href="target"
-                  target="_blank"
-                  style="text-decoration:none"
-                >
-                  {{target}}
+                <span style="font-weight: bolder">Target {{ index + 1 }}</span
+                ><br />
+                <a :href="target" target="_blank" style="text-decoration: none">
+                  {{ target }}
                 </a>
-                <br/><br/>
-                <span style="font-weight:bolder;">Target IPFS Hash</span>
-                <br/>
+                <br /><br />
+                <span style="font-weight: bolder">Target IPFS Hash</span>
+                <br />
                 <a
                   :href="`https://ipfs.io/ipfs/${requestObject.targetsIPFSHashes[index]}`"
                   target="_blank"
-                  style="text-decoration:none"
+                  style="text-decoration: none"
                 >
-                  {{requestObject.targetsIPFSHashes[index]}}
+                  {{ requestObject.targetsIPFSHashes[index] }}
                 </a>
-                <br/><br/>
+                <br /><br />
               </div>
-              <br/>
-              <span style="font-weight:bolder;">IPFS Hash</span>
-              <br/>
+              <br />
+              <span style="font-weight: bolder">IPFS Hash</span>
+              <br />
               <a
                 :href="`https://ipfs.io/ipfs/${requestObject.formIpfsHash}`"
                 target="_blank"
-                style="text-decoration:none"
+                style="text-decoration: none"
               >
-                {{requestObject.formIpfsHash}}
+                {{ requestObject.formIpfsHash }}
               </a>
-              <br/><br/>
-              <span style="font-weight:bolder;">Reward per review	</span><br/>
-              {{requestObject.rewardPerReview/1000000000000000000}} ETH <br/><br/>
-              <span style="font-weight:bolder;">Closed</span><br/>
-              {{requestObject.isClosed ? 'Yes' : 'No'}} <br/><br/>
-              <span style="font-weight:bolder;">Review Form index</span><br/>
-              {{requestObject.reviewFormIndex}}<br/><br/>
+              <br /><br />
+              <span style="font-weight: bolder">Reward per review </span><br />
+              {{ requestObject.rewardPerReview / 1000000000000000000 }} ETH
+              <br /><br />
+              <span style="font-weight: bolder">Closed</span><br />
+              {{ requestObject.isClosed ? "Yes" : "No" }} <br /><br />
+              <span style="font-weight: bolder">Review Form index</span><br />
+              {{ requestObject.reviewFormIndex }}<br /><br />
             </div>
           </el-card>
         </el-col>
@@ -153,7 +151,7 @@
           <h2>Review Form</h2>
           <el-table :data="formData" border style="width: 100%">
             <el-table-column prop="question" label="Question" />
-            <el-table-column prop="type" label="Type"/>
+            <el-table-column prop="type" label="Type" />
             <el-table-column prop="choices" label="Choices" />
           </el-table>
         </el-col>
@@ -163,7 +161,11 @@
 </template>
 
 <script>
-import { getReviewForm, getRequestNames, getRequest } from "@/services/ContractService";
+import {
+  getReviewForm,
+  getRequestNames,
+  getRequest,
+} from "@/services/ContractService";
 import { useStore } from "vuex";
 import { watch, computed, ref, onBeforeMount } from "vue";
 import { ElNotification } from "element-plus";
@@ -179,13 +181,13 @@ export default {
 
     const contract = computed(() => contractState.contract);
     const notificationTime = process.env.VUE_APP_NOTIFICATION_DURATION;
-    
-    const requestName = ref('')
-    const requestNames = ref()
-    const requestObject = ref()
-    const reviewForm = ref({})
-    const contractRef = ref(contract)
-    const formData = ref()
+
+    const requestName = ref("");
+    const requestNames = ref();
+    const requestObject = ref();
+    const reviewForm = ref({});
+    const contractRef = ref(contract);
+    const formData = ref();
 
     const sendBtn = async () => {
       dispatch("setLoading", true);
@@ -195,30 +197,33 @@ export default {
       };
 
       try {
-        formData.value = []
+        formData.value = [];
 
-        requestObject.value = await getRequest(payload)
+        requestObject.value = await getRequest(payload);
 
         const reviewFormPayload = {
           reviewFormIndex: requestObject.value.reviewFormIndex,
-          contractMethods: contract.value.methods
-        }
+          contractMethods: contract.value.methods,
+        };
         reviewForm.value = await getReviewForm(reviewFormPayload);
         reviewForm.value[0].forEach((question, index) => {
           let reviewFormHash = {
-            question: '',
-            type: '',
-            choices: ''
-          }
+            question: "",
+            type: "",
+            choices: "",
+          };
 
-          reviewFormHash.question = reviewForm.value[0][index]
-          reviewFormHash.type = reviewForm.value[1][index] == 0 ? 'Text' : reviewForm.value[1][index] == 1 ? 'Yes/No' : 'Single Choice'
-          reviewFormHash.choices = reviewForm.value[2][index].join('\n')
+          reviewFormHash.question = reviewForm.value[0][index];
+          reviewFormHash.type =
+            reviewForm.value[1][index] == 0
+              ? "Text"
+              : reviewForm.value[1][index] == 1
+              ? "Yes/No"
+              : "Single Choice";
+          reviewFormHash.choices = reviewForm.value[2][index].join("\n");
 
-          formData.value.push(reviewFormHash)
-        })
-
-        console.log(formData.value)
+          formData.value.push(reviewFormHash);
+        });
       } catch (e) {
         ElNotification({
           title: "Error getting Review Request",
@@ -233,21 +238,20 @@ export default {
     onBeforeMount(async () => {
       if (contractRef.value) {
         const payload = {
-          contractMethods: contract.value.methods
-        }
-        requestNames.value = await getRequestNames(payload)
+          contractMethods: contract.value.methods,
+        };
+        requestNames.value = await getRequestNames(payload);
       }
     });
 
-    watch([contractRef], async() => {
+    watch([contractRef], async () => {
       if (contractRef.value) {
         const payload = {
-          contractMethods: contract.value.methods
-        }
-        requestNames.value = await getRequestNames(payload)
+          contractMethods: contract.value.methods,
+        };
+        requestNames.value = await getRequestNames(payload);
       }
-    })
-
+    });
 
     return {
       requestNames,
@@ -270,7 +274,7 @@ export default {
   float: left;
 }
 .review-card {
-  margin-top:30px;
+  margin-top: 30px;
   text-align: left;
 }
 .review-title {
@@ -278,7 +282,7 @@ export default {
   font-weight: bold;
 }
 .review-body {
-  font-size:15px;
+  font-size: 15px;
 }
 </style>
 <style>

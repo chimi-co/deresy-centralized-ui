@@ -11,7 +11,7 @@
                   v-model="requestName"
                   placeholder="Select a review request name"
                   size="large"
-                  style="width:100%;"
+                  style="width: 100%"
                 >
                   <el-option
                     v-for="(requestName, index) in requestNames"
@@ -60,10 +60,10 @@ export default {
     const walletAddress = computed(() => user.walletAddress);
     const contract = computed(() => contractState.contract);
     const notificationTime = process.env.VUE_APP_NOTIFICATION_DURATION;
-    
-    const requestName = ref('')
-    const requestNames = ref()
-    const contractRef = ref(contract)
+
+    const requestName = ref("");
+    const requestNames = ref();
+    const contractRef = ref(contract);
 
     const sendBtn = async () => {
       dispatch("setLoading", true);
@@ -74,7 +74,7 @@ export default {
       };
 
       try {
-        await closeRequest(web3.value, contract.value, payload)
+        await closeRequest(web3.value, contract.value, payload);
 
         ElNotification({
           title: "Success",
@@ -112,21 +112,20 @@ export default {
     onBeforeMount(async () => {
       if (contractRef.value) {
         const payload = {
-          contractMethods: contract.value.methods
-        }
-        requestNames.value = await getRequestNames(payload)
+          contractMethods: contract.value.methods,
+        };
+        requestNames.value = await getRequestNames(payload);
       }
     });
 
-    watch([contractRef], async() => {
+    watch([contractRef], async () => {
       if (contractRef.value) {
         const payload = {
-          contractMethods: contract.value.methods
-        }
-        requestNames.value = await getRequestNames(payload)
+          contractMethods: contract.value.methods,
+        };
+        requestNames.value = await getRequestNames(payload);
       }
-    })
-
+    });
 
     return {
       requestNames,

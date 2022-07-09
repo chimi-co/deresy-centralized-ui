@@ -21,7 +21,7 @@
                   v-model="requestObject.reviewFormIndex"
                   placeholder="Select a review form index"
                   size="large"
-                  style="width:100%;"
+                  style="width: 100%"
                 >
                   <el-option
                     v-for="(o, index) in parseInt(reviewFormsTotal)"
@@ -37,7 +37,7 @@
                 <el-input
                   v-for="(reviewer, index) in requestObject.reviewers"
                   :key="index"
-                  style="margin-top:5px"
+                  style="margin-top: 5px"
                   v-model="requestObject.reviewers[index]"
                   label="Reviewer"
                   type="text"
@@ -46,11 +46,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-button
-                @click="addReviewer()"
-                class="add-btn"
-                type="primary"
-              >
+              <el-button @click="addReviewer()" class="add-btn" type="primary">
                 Add Reviewer
               </el-button>
             </el-col>
@@ -59,7 +55,7 @@
                 <el-input
                   v-for="(target, index) in requestObject.targets"
                   :key="index"
-                  style="margin-top:5px"
+                  style="margin-top: 5px"
                   v-model="requestObject.targets[index]"
                   label="Target"
                   type="text"
@@ -72,7 +68,7 @@
                 <el-input
                   v-for="(target, index) in requestObject.targetHashes"
                   :key="index"
-                  style="margin-top:5px"
+                  style="margin-top: 5px"
                   v-model="requestObject.targetHashes[index]"
                   label="Target IPFS Hash"
                   type="text"
@@ -81,11 +77,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-button
-                @click="addTarget()"
-                class="add-btn"
-                type="primary"
-              >
+              <el-button @click="addTarget()" class="add-btn" type="primary">
                 Add Target
               </el-button>
             </el-col>
@@ -147,40 +139,46 @@ export default {
     const walletAddress = computed(() => user.walletAddress);
     const notificationTime = process.env.VUE_APP_NOTIFICATION_DURATION;
 
-    const reviewFormsTotal = ref(0)
-    const contractRef = ref(contract)
+    const reviewFormsTotal = ref(0);
+    const contractRef = ref(contract);
 
     const requestObject = reactive({
-      name: '',
-      reviewFormIndex: '',
+      name: "",
+      reviewFormIndex: "",
       targets: [],
-      targetHashes:[],
+      targetHashes: [],
       reviewers: [],
-      requestHash: '',
-      rewardPerReview: ''
+      requestHash: "",
+      rewardPerReview: "",
     });
 
     const addReviewer = () => {
-      requestObject.reviewers.push('')
+      requestObject.reviewers.push("");
     };
 
     const addTarget = () => {
-      requestObject.targets.push('')
-      requestObject.targetHashes.push('')
+      requestObject.targets.push("");
+      requestObject.targetHashes.push("");
     };
 
     const deleteReviewer = (index) => {
-      console.log[index]
+      console.log[index];
     };
 
     const deleteTarget = (index) => {
-      console.log[index]
+      console.log[index];
     };
 
     const sendBtn = async () => {
       dispatch("setLoading", true);
-      const rewardPerReviewToWei = web3.value.utils.toWei(requestObject.rewardPerReview.toString(), "ether");
-      const totalReward = rewardPerReviewToWei * requestObject.reviewers.length * requestObject.targets.length
+      const rewardPerReviewToWei = web3.value.utils.toWei(
+        requestObject.rewardPerReview.toString(),
+        "ether"
+      );
+      const totalReward =
+        rewardPerReviewToWei *
+        requestObject.reviewers.length *
+        requestObject.targets.length;
       const payload = {
         name: requestObject.name,
         reviewFormIndex: requestObject.reviewFormIndex,
@@ -231,26 +229,26 @@ export default {
     };
 
     onBeforeMount(async () => {
-      requestObject.reviewers.push('')
-      requestObject.targets.push('')
-      requestObject.targetHashes.push('')
+      requestObject.reviewers.push("");
+      requestObject.targets.push("");
+      requestObject.targetHashes.push("");
 
       if (contractRef.value) {
         const payload = {
-          contractMethods: contract.value.methods
-        }
-        reviewFormsTotal.value = await getReviewFormsTotal(payload)
+          contractMethods: contract.value.methods,
+        };
+        reviewFormsTotal.value = await getReviewFormsTotal(payload);
       }
     });
 
-    watch([contractRef], async() => {
+    watch([contractRef], async () => {
       if (contractRef.value) {
         const payload = {
-          contractMethods: contract.value.methods
-        }
-        reviewFormsTotal.value = await getReviewFormsTotal(payload)
+          contractMethods: contract.value.methods,
+        };
+        reviewFormsTotal.value = await getReviewFormsTotal(payload);
       }
-    })
+    });
 
     return {
       requestObject,

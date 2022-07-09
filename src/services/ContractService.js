@@ -53,11 +53,13 @@ export const createReviewForm = async (web3, contract, params) => {
 };
 
 export const getReviewForm = async (params) => {
-  const { contractMethods, reviewFormIndex } = params
+  const { contractMethods, reviewFormIndex } = params;
   try {
     console.log("Getting review form");
 
-    const response = await contractMethods.getReviewForm(reviewFormIndex).call();
+    const response = await contractMethods
+      .getReviewForm(reviewFormIndex)
+      .call();
 
     return response;
   } catch (e) {
@@ -67,12 +69,11 @@ export const getReviewForm = async (params) => {
 };
 
 export const getReviewFormsTotal = async (params) => {
-  const { contractMethods } = params
+  const { contractMethods } = params;
   try {
     console.log("Getting review forms total");
 
     const response = contractMethods.reviewFormsTotal().call();
-    console.log(response)
 
     return response;
   } catch (e) {
@@ -105,7 +106,17 @@ export const createRequest = async (web3, contract, params) => {
       from: walletAddress,
       to: contractAddress,
       value: totalReward,
-      data: methods.createRequest(name, reviewers, targets, targetHashes, requestHash, rewardPerReview, reviewFormIndex).encodeABI(),
+      data: methods
+        .createRequest(
+          name,
+          reviewers,
+          targets,
+          targetHashes,
+          requestHash,
+          rewardPerReview,
+          reviewFormIndex
+        )
+        .encodeABI(),
     };
 
     await web3.eth
@@ -125,12 +136,11 @@ export const createRequest = async (web3, contract, params) => {
 };
 
 export const getRequest = async (params) => {
-  const { requestName, contractMethods } = params
+  const { requestName, contractMethods } = params;
   try {
     console.log("Getting request");
 
     const response = contractMethods.getRequest(requestName).call();
-    console.log(response)
 
     return response;
   } catch (e) {
@@ -140,12 +150,11 @@ export const getRequest = async (params) => {
 };
 
 export const getRequestNames = async (params) => {
-  const { contractMethods } = params
+  const { contractMethods } = params;
   try {
     console.log("Getting request names");
 
     const response = contractMethods.getReviewRequestsNames().call();
-    console.log(response)
 
     return response;
   } catch (e) {
