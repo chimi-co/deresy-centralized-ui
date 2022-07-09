@@ -15,41 +15,41 @@
 </template>
 
 <script>
-  export default {
-    name: 'Login',
-    components: {},
-    created() {
-      this.returnUrl = this.$route.query.returnUrl || '/'
-    },
-    setup() {},
-    data() {
-      return {
-        loginPassword: '',
+export default {
+  name: "Login",
+  components: {},
+  created() {
+    this.returnUrl = this.$route.query.returnUrl || "/";
+  },
+  setup() {},
+  data() {
+    return {
+      loginPassword: "",
+    };
+  },
+  methods: {
+    submitLogin() {
+      if (this.loginPassword == "logout") {
+        localStorage.removeItem("user");
+      }
+
+      if (
+        this.loginPassword != "" &&
+        process.env.VUE_APP_LOGIN_PASSWORDS.includes(this.loginPassword)
+      ) {
+        localStorage.setItem("user", "LOGGED IN");
+        this.$router.push(this.$route.query.returnUrl);
+      } else {
+        alert("Invalid Password");
       }
     },
-    methods: {
-      submitLogin() {
-        if (this.loginPassword == 'logout') {
-          localStorage.removeItem('user')
-        }
-
-        if (
-          this.loginPassword != '' &&
-          process.env.VUE_APP_LOGIN_PASSWORDS.includes(this.loginPassword)
-        ) {
-          localStorage.setItem('user', 'LOGGED IN')
-          this.$router.push(this.$route.query.returnUrl)
-        } else {
-          alert('Invalid Password')
-        }
-      },
-    },
-  }
+  },
+};
 </script>
 
 <style scoped>
-  .s1-section-1 {
-    display: inline-block;
-    vertical-align: top;
-  }
+.s1-section-1 {
+  display: inline-block;
+  vertical-align: top;
+}
 </style>

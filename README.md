@@ -1,4 +1,4 @@
-# studio-uno-ui
+# deresy-ui
 
 ## Project setup
 

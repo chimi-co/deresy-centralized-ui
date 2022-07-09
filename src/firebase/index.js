@@ -1,7 +1,7 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
-import 'firebase/firestore'
-import 'firebase/storage'
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
+import "firebase/storage";
 
 const config = {
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
@@ -11,16 +11,16 @@ const config = {
   messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID,
   projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
   storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
-}
+};
 
 // Initialize Firebase application
-const app = firebase.initializeApp(config)
+const app = firebase.initializeApp(config);
 
 // Export Firebase auth instance
-export const auth = app.auth() // Commented
+export const auth = app.auth(); // Commented
 
 // Export Firestore database instance
-export const db = app.firestore()
+export const db = app.firestore();
 
 // Export Firebase Storage
-export const storage = app.storage() // Commented
+export const storage = app.storage(); // Commented

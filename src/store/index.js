@@ -1,9 +1,9 @@
-import { createStore } from 'vuex'
-import VuexPersistence from 'vuex-persist'
+import { createStore } from "vuex";
+import VuexPersistence from "vuex-persist";
 
-import contract from './contract'
-import user from './user'
-import root from './root'
+import contract from "./contract";
+import user from "./user";
+import root from "./root";
 
 export default createStore({
   modules: {
@@ -13,7 +13,7 @@ export default createStore({
   },
   plugins: [
     new VuexPersistence({
-      modules: ['contract', 'user', 'root'],
+      modules: ["contract", "user", "root"],
     }).plugin,
   ],
-})
+});

@@ -4,7 +4,7 @@
       <el-container>
         <el-header class="header">
           <div class="logo-container">
-            <strong>DERESY</strong>
+            <Logo :logo="require('../../assets/images/logo-deresy.png')" />
           </div>
           <div class="menu-container">
             <div class="desktop">
@@ -15,7 +15,10 @@
                 @close="handleClose"
                 @select="handleSelect"
               >
-                <el-menu-item index="/create-review-form" @click="goToPath('/create-review-form')">
+                <el-menu-item
+                  index="/create-review-form"
+                  @click="goToPath('/create-review-form')"
+                >
                   Create Review Form
                 </el-menu-item>
                 <el-menu-item
@@ -105,7 +108,10 @@
         @close="handleClose"
         @select="handleSelect"
       >
-        <el-menu-item index="/create-review-form" @click="goToPath('/create-review-form')">
+        <el-menu-item
+          index="/create-review-form"
+          @click="goToPath('/create-review-form')"
+        >
           Create Review Form
         </el-menu-item>
         <el-menu-item
@@ -144,216 +150,218 @@
 </template>
 
 <script>
-  import { defineComponent, ref, computed } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { Fold } from '@element-plus/icons'
+import { defineComponent, ref, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { Fold } from "@element-plus/icons";
 
-  import NetworkAlert from '../network-alert'
-  import Wallet from '../wallet'
-  import { useStore } from 'vuex'
+import Logo from "../logo";
+import NetworkAlert from "../network-alert";
+import Wallet from "../wallet";
+import { useStore } from "vuex";
 
-  export default defineComponent({
-    name: 'Layout',
-    components: {
-      Fold,
-      NetworkAlert,
-      Wallet,
-    },
+export default defineComponent({
+  name: "Layout",
+  components: {
+    Logo,
+    Fold,
+    NetworkAlert,
+    Wallet,
+  },
 
-    setup() {
-      const route = useRoute()
-      const router = useRouter()
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
 
-      const drawer = ref(false)
-      const activeIndex = ref(window.location.pathname)
+    const drawer = ref(false);
+    const activeIndex = ref(window.location.pathname);
 
-      const goToPath = (path) => {
-        if (route.path !== path) {
-          router.push({ path })
-        }
+    const goToPath = (path) => {
+      if (route.path !== path) {
+        router.push({ path });
       }
-      const store = useStore()
-      const {
-        state: { root },
-      } = store
+    };
+    const store = useStore();
+    const {
+      state: { root },
+    } = store;
 
-      const projectsData = computed(() => root.projects)
+    const projectsData = computed(() => root.projects);
 
-      const handleClose = (done) => {
-        if (typeof done === 'function') {
-          done()
-        }
+    const handleClose = (done) => {
+      if (typeof done === "function") {
+        done();
       }
+    };
 
-      const handleOpen = () => {}
+    const handleOpen = () => {};
 
-      const handleSelect = (index) => {
-        if (index === '4') {
-          drawer.value = true
-        } else {
-          drawer.value = false
-        }
+    const handleSelect = (index) => {
+      if (index === "4") {
+        drawer.value = true;
+      } else {
+        drawer.value = false;
       }
+    };
 
-      return {
-        drawer,
-        activeIndex,
-        projectsData,
-        goToPath,
-        handleClose,
-        handleOpen,
-        handleSelect,
-      }
-    },
-  })
+    return {
+      drawer,
+      activeIndex,
+      projectsData,
+      goToPath,
+      handleClose,
+      handleOpen,
+      handleSelect,
+    };
+  },
+});
 </script>
 
 <style>
-  body,
-  html {
-    margin: 0;
-    overflow: hidden;
-  }
+body,
+html {
+  margin: 0;
+  overflow: hidden;
+}
 
-  .el-drawer__body {
-    padding: 0 !important;
-    text-align: left;
-  }
+.el-drawer__body {
+  padding: 0 !important;
+  text-align: left;
+}
 
-  .el-drawer__body .el-menu-item.dock-right {
-    padding: 0 !important;
-    text-align: center;
-  }
+.el-drawer__body .el-menu-item.dock-right {
+  padding: 0 !important;
+  text-align: center;
+}
 </style>
 <style scoped>
-  .header {
-    height: 64px;
-    padding: 0;
-    border-bottom: 1px solid #e6e6e6;
-  }
+.header {
+  height: 64px;
+  padding: 0;
+  border-bottom: 1px solid #e6e6e6;
+}
 
-  .main {
-    height: calc(100vh - 180px);
-    padding: 6px;
-  }
+.main {
+  height: calc(100vh - 180px);
+  padding: 6px;
+}
 
-  .footer {
-    margin-top: 30px;
-    background: #d5ffff;
-    height: 100%;
-    font-size: 0.75em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 900;
-  }
+.footer {
+  margin-top: 30px;
+  background: #d5ffff;
+  height: 100%;
+  font-size: 0.75em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+}
 
+.logo-container {
+  width: 200px;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  line-height: 56px;
+  margin: 0;
+  padding: 0 20px;
+  list-style: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  white-space: nowrap;
+  float: left;
+}
+
+.logo-container * {
+  vertical-align: middle;
+}
+
+.menu-container {
+  width: calc(100% - 210px);
+  height: 100%;
+  float: right;
+  display: flex;
+}
+
+.menu-container .el-menu {
+  width: 100%;
+  justify-content: right;
+}
+
+.menu-container .el-menu--horizontal {
+  border-bottom: 0;
+}
+
+.fold-icon {
+  width: 2em;
+  height: 2em;
+  vertical-align: middle;
+}
+
+.fold-icon svg {
+  width: 2em;
+  height: 2em;
+}
+
+.desktop {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+
+.mobile {
+  float: right;
+  display: none;
+}
+
+.wallet-container {
+  margin: 0 40px;
+}
+
+.wallet-mobile-container {
+  width: 100%;
+}
+
+.s1-social-links img {
+  width: 25px;
+  height: auto;
+}
+
+.s1-social-links a {
+  margin: 10px 5px 10px 15px;
+}
+
+.s1-social-links {
+  margin-top: 10px;
+}
+
+.mobile-menu-item {
+  font-weight: bold;
+}
+
+/* Specific styles for Mobile Devices */
+@media screen and (max-width: 575px) {
   .logo-container {
-    width: 200px;
-    justify-content: center;
-    align-items: center;
-    height: 60px;
-    line-height: 56px;
-    margin: 0;
-    padding: 0 20px;
-    list-style: none;
-    cursor: pointer;
-    box-sizing: border-box;
-    white-space: nowrap;
-    float: left;
-  }
-
-  .logo-container * {
-    vertical-align: middle;
+    width: 80px;
   }
 
   .menu-container {
-    width: calc(100% - 210px);
-    height: 100%;
-    float: right;
-    display: flex;
+    width: 45px;
   }
 
-  .menu-container .el-menu {
-    width: 100%;
-    justify-content: right;
-  }
-
-  .menu-container .el-menu--horizontal {
-    border-bottom: 0;
-  }
-
-  .fold-icon {
-    width: 2em;
-    height: 2em;
-    vertical-align: middle;
-  }
-
-  .fold-icon svg {
-    width: 2em;
-    height: 2em;
+  .main {
+    padding: 6px;
   }
 
   .desktop {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: right;
-  }
-
-  .mobile {
-    float: right;
     display: none;
   }
 
-  .wallet-container {
-    margin: 0 40px;
+  .mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-
-  .wallet-mobile-container {
-    width: 100%;
-  }
-
-  .s1-social-links img {
-    width: 25px;
-    height: auto;
-  }
-
-  .s1-social-links a {
-    margin: 10px 5px 10px 15px;
-  }
-
-  .s1-social-links {
-    margin-top: 10px;
-  }
-
-  .mobile-menu-item {
-    font-weight: bold;
-  }
-
-  /* Specific styles for Mobile Devices */
-  @media screen and (max-width: 575px) {
-    .logo-container {
-      width: 80px;
-    }
-
-    .menu-container {
-      width: 45px;
-    }
-
-    .main {
-      padding: 6px;
-    }
-
-    .desktop {
-      display: none;
-    }
-
-    .mobile {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
+}
 </style>

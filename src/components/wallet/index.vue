@@ -27,7 +27,7 @@
         <a
           v-if="!isMetamaskApp"
           class="btn wallet__btn"
-          href="https://metamask.app.link/dapp/studiouno.io/"
+          href="https://metamask.app.link/dapp/deresy.io/"
         >
           <span class="icon-link">
             <img :src="require('../../assets/icons/metamask.png')" />
@@ -53,151 +53,163 @@
 </template>
 
 <script>
-  import { useStore } from 'vuex'
-  import { computed, ref, onMounted } from 'vue'
+import { useStore } from "vuex";
+import { computed, ref, onMounted } from "vue";
 
-  import web3Modal from '@/web3Modal'
-  import { web3WalletClient } from '@/web3'
-  import detectEthereumProvider from '@metamask/detect-provider'
+import web3Modal from "@/web3Modal";
+import { web3WalletClient } from "@/web3";
+import detectEthereumProvider from "@metamask/detect-provider";
 
-  import Popup from '../../components/popup/index.vue'
+import { getContract } from "@/services/ContractService";
+import {
+  DERESY_CONTRACT_ABI,
+  DERESY_CONTRACT_ADDRESS,
+} from "@/constants/contractConstants";
 
-  import { NETWORK_NAMES } from '@/constants/walletConstants'
-  import {
-    connectWallet,
-    subscribeProvider,
-    onDisconnect,
-  } from '@/services/ProviderService'
+import Popup from "../../components/popup/index.vue";
 
-  export default {
-    name: 'Wallet',
-    components: {
-      Popup,
-    },
-    setup() {
-      const store = useStore()
+import { NETWORK_NAMES } from "@/constants/walletConstants";
+import {
+  connectWallet,
+  subscribeProvider,
+  onDisconnect,
+} from "@/services/ProviderService";
 
-      const {
-        dispatch,
-        state: { user },
-      } = store
+export default {
+  name: "Wallet",
+  components: {
+    Popup,
+  },
+  setup() {
+    const store = useStore();
 
-      const owner = ref('')
-      const showUnlinkButton = ref(false)
-      const providerRef = ref(null)
-      const balance = computed(() => user.balance)
-      const walletAddress = computed(() => user.walletAddress)
-      const network = computed(() => NETWORK_NAMES[user.networkId])
-      const showPopup = ref(false)
-      const isMetamaskApp = ref(false)
+    const {
+      dispatch,
+      state: { user },
+    } = store;
 
-      const walletAddressRef = ref(walletAddress)
+    const owner = ref("");
+    const showUnlinkButton = ref(false);
+    const providerRef = ref(null);
+    const balance = computed(() => user.balance);
+    const walletAddress = computed(() => user.walletAddress);
+    const network = computed(() => NETWORK_NAMES[user.networkId]);
+    const showPopup = ref(false);
+    const isMetamaskApp = ref(false);
 
-      const onConnect = async () => {
-        dispatch('setLoading', true)
+    const walletAddressRef = ref(walletAddress);
 
-        try {
-          // Get provider from service
-          const { provider } = await connectWallet(store)
-          providerRef.value = provider
+    const onConnect = async () => {
+      dispatch("setLoading", true);
 
-          showUnlinkButton.value =
-            web3Modal.cachedProvider === 'custom-coinbase'
+      try {
+        // Get provider from service
+        const { provider } = await connectWallet(store);
+        providerRef.value = provider;
 
-          await subscribeProvider(provider, store)
+        showUnlinkButton.value = web3Modal.cachedProvider === "custom-coinbase";
 
-          const web3 = web3WalletClient(provider)
+        await subscribeProvider(provider, store);
 
-          dispatch('setProvider', provider)
-          dispatch('setWeb3', web3)
-          showPopup.value = false
-        } catch (error) {
-          console.error(error)
-        }
+        const web3 = web3WalletClient(provider);
 
-        dispatch('setLoading', false)
+        const contract = await getContract(
+          web3,
+          DERESY_CONTRACT_ABI,
+          DERESY_CONTRACT_ADDRESS
+        );
+
+        dispatch("setProvider", provider);
+        dispatch("setWeb3", web3);
+        dispatch("setContract", contract);
+        showPopup.value = false;
+      } catch (error) {
+        console.error(error);
       }
 
-      const disconnectWallet = async () => {
-        await onDisconnect(store)
-      }
+      dispatch("setLoading", false);
+    };
 
-      const onUnlinkAccount = async () => {
-        const provider = providerRef.value
-        if (typeof provider.close === 'function') {
-          provider.close()
-          await onDisconnect(store)
-        }
-      }
+    const disconnectWallet = async () => {
+      await onDisconnect(store);
+    };
 
-      onMounted(async () => {
-        const mmProvider = await detectEthereumProvider()
-        if (web3Modal.cachedProvider) {
-          await onConnect()
-        }
-        if (mmProvider) {
-          isMetamaskApp.value = true
-        }
-      })
-
-      const onTogglePopup = () => {
-        showPopup.value = !showPopup.value
-        console.log(showPopup.value)
+    const onUnlinkAccount = async () => {
+      const provider = providerRef.value;
+      if (typeof provider.close === "function") {
+        provider.close();
+        await onDisconnect(store);
       }
+    };
 
-      return {
-        balance,
-        network,
-        owner,
-        showUnlinkButton,
-        walletAddressRef,
-        onUnlinkAccount,
-        onConnect,
-        disconnectWallet,
-        onTogglePopup,
-        showPopup,
-        isMetamaskApp,
+    onMounted(async () => {
+      const mmProvider = await detectEthereumProvider();
+      if (web3Modal.cachedProvider) {
+        await onConnect();
       }
-    },
-  }
+      if (mmProvider) {
+        isMetamaskApp.value = true;
+      }
+    });
+
+    const onTogglePopup = () => {
+      showPopup.value = !showPopup.value;
+      console.log(showPopup.value);
+    };
+
+    return {
+      balance,
+      network,
+      owner,
+      showUnlinkButton,
+      walletAddressRef,
+      onUnlinkAccount,
+      onConnect,
+      disconnectWallet,
+      onTogglePopup,
+      showPopup,
+      isMetamaskApp,
+    };
+  },
+};
 </script>
 
 <style>
-  .wallet__btn {
-    width: 100%;
-    padding: 16px;
-    vertical-align: middle;
-    text-decoration: none;
-    color: #555555;
-    font-weight: bold;
-  }
+.wallet__btn {
+  width: 100%;
+  padding: 16px;
+  vertical-align: middle;
+  text-decoration: none;
+  color: #555555;
+  font-weight: bold;
+}
 
-  .wallet-btn__content .wallet__btn:not(:last-child) {
-    border-bottom: 1px solid rgb(229, 232, 235);
-  }
+.wallet-btn__content .wallet__btn:not(:last-child) {
+  border-bottom: 1px solid rgb(229, 232, 235);
+}
 
-  .wallet-btn__content {
-    border: 1px solid rgb(229, 232, 235);
-    border-radius: 10px;
-  }
+.wallet-btn__content {
+  border: 1px solid rgb(229, 232, 235);
+  border-radius: 10px;
+}
 
-  .icon-link img {
-    height: 24px;
-    margin-right: 16px;
-    vertical-align: middle;
-  }
+.icon-link img {
+  height: 24px;
+  margin-right: 16px;
+  vertical-align: middle;
+}
 
-  .popup-wallets .popup__inner {
-    border-radius: 10px;
+.popup-wallets .popup__inner {
+  border-radius: 10px;
+}
+@media only screen and (max-width: 767px) {
+  .btn.desktop {
+    display: none;
   }
-  @media only screen and (max-width: 767px) {
-    .btn.desktop {
-      display: none;
-    }
+}
+@media only screen and (min-width: 768px) {
+  .btn.mobile {
+    display: none;
   }
-  @media only screen and (min-width: 768px) {
-    .btn.mobile {
-      display: none;
-    }
-  }
+}
 </style>

@@ -5,18 +5,18 @@
 </template>
 
 <script>
-  export default {
-    name: 'Logo',
-    props: {
-      logo: String,
-      modifier: String,
-    },
-  }
+export default {
+  name: "Logo",
+  props: {
+    logo: String,
+    modifier: String,
+  },
+};
 </script>
 
 <style scoped>
-  .logo img {
-    width: 60px;
-    vertical-align: middle;
-  }
+.logo img {
+  width: 60px;
+  vertical-align: middle;
+}
 </style>

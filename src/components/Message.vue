@@ -3,11 +3,11 @@
 </template>
 
 <script>
-  export default {
-    name: 'Message',
+export default {
+  name: "Message",
 
-    props: {
-      message: String,
-    },
-  }
+  props: {
+    message: String,
+  },
+};
 </script>
