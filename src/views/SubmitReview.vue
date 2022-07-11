@@ -8,7 +8,7 @@
             <el-col :span="18">
               <el-form-item label="Review Request Name">
                 <el-select
-                  v-model="requestName"
+                  v-model="reviewObject.requestName"
                   placeholder="Select a review request name"
                   size="large"
                   style="width: 100%"
@@ -29,7 +29,7 @@
                 class="send-btn"
                 type="primary"
                 style="margin-top: 30px"
-                :disabled="!requestName"
+                :disabled="!reviewObject.requestName"
               >
                 Get Form
               </el-button>
@@ -82,11 +82,10 @@
                 <el-form-item :label="question">
                   <el-input
                     v-if="reviewForm[1][index] == '0'"
-                    style="margin-top: 5px"
+                    style="margin-top: 5px; width:100%"
                     v-model="reviewObject.reviews[index]"
                     type="text"
                     placeholder="Enter your answer"
-                    required
                   />
                   <el-radio-group
                     v-if="reviewForm[1][index] == '1'"
@@ -111,14 +110,13 @@
                   </el-radio-group>
                 </el-form-item>
               </el-col>
-              <el-row v-if="requestName && reviewObject.targetIndex != null">
+              <el-row v-if="reviewObject.requestName && reviewObject.targetIndex != null">
                 <el-col :span="24">
                   <el-button
-                    @click="sendBtn2()"
+                    @click="sendBtn()"
                     class="send-btn"
                     type="success"
                     size="large"
-                    :disabled="!allowToSubmit()"
                   >
                     Send
                   </el-button>
@@ -169,7 +167,6 @@ export default {
     const contract = computed(() => contractState.contract);
     const notificationTime = process.env.VUE_APP_NOTIFICATION_DURATION;
 
-    const requestName = ref();
     const requestNames = ref();
     const contractRef = ref(contract);
     const walletAddressRef = ref(walletAddress);
@@ -177,6 +174,7 @@ export default {
     const reviewForm = ref({});
 
     const reviewObject = reactive({
+      requestName: null,
       targetIndex: null,
       reviews: [],
     });
@@ -191,7 +189,7 @@ export default {
 
     const allowToSubmit = () => {
       return (
-        requestName.value &&
+        reviewObject.requestName &&
         reviewObject.targetIndex &&
         reviewObject.reviews.length == reviewForm.value[0].length &&
         !reviewObject.reviews.includes(undefined)
@@ -211,7 +209,7 @@ export default {
 
     const getFormBtn = async () => {
       const requestPayload = {
-        requestName: requestName.value,
+        requestName: reviewObject.requestName,
         contractMethods: contract.value.methods,
       };
       requestObject.value = await getRequest(requestPayload);
@@ -226,7 +224,7 @@ export default {
     const sendBtn = async () => {
       dispatch("setLoading", true);
       const payload = {
-        name: requestName.value,
+        name: reviewObject.requestName,
         targetIndex: reviewObject.targetIndex,
         answers: reviewObject.reviews,
         contractAddress: DERESY_CONTRACT_ADDRESS,
@@ -291,7 +289,6 @@ export default {
       walletAddressRef,
       reviewObject,
       requestNames,
-      requestName,
       requestObject,
       reviewForm,
       targetSelected,
