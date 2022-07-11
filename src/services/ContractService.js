@@ -194,28 +194,35 @@ export const closeRequest = async (web3, contract, params) => {
   return response;
 };
 
-export const submitReview = async (params) => {
-  const { name, submitTargetIndex, answers, walletAddress, contractAddress } =
+export const submitReview = async (web3, contract, params) => {
+  const { name, targetIndex, answers, walletAddress, contractAddress } =
     params;
+
+  const { methods } = contract;
+
+  let response;
 
   try {
     console.log("Submitting review");
 
-    const data = this.contract.methods
-      .createReviewForm(name, submitTargetIndex, answers)
-      .encodeABI();
+    const transaction = {
+      from: walletAddress,
+      to: contractAddress,
+      data: methods.submitReview(name, targetIndex, answers).encodeABI(),
+    };
 
-    const response = await this.sendTransaction(
-      walletAddress,
-      contractAddress,
-      data,
-      null,
-      "Transaction in progress."
-    );
-
-    return response;
+    await web3.eth
+      .sendTransaction(transaction)
+      .on("transactionHash", (txHash) => {
+        sendTransactionNotification(txHash, "Transaction in progress");
+      })
+      .on("receipt", (receipt) => {
+        response = receipt;
+      });
   } catch (e) {
     console.error("An error ocurred while submitting the review.", e);
     throw e;
   }
+
+  return response;
 };
