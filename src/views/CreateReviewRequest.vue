@@ -13,6 +13,7 @@
                   type="text"
                   placeholder="Enter a name for the request"
                 />
+                <span class="vuelidation-error" v-if="v$.name.$error"> {{ v$.name.$errors[0].$message }} </span>
               </el-form-item>
             </el-col>
             <el-col :span="24">
@@ -30,6 +31,7 @@
                     :value="index"
                   />
                 </el-select>
+                <span class="vuelidation-error" v-if="v$.reviewFormIndex.$error"> {{ v$.reviewFormIndex.$errors[0].$message }} </span>
               </el-form-item>
             </el-col>
             <el-col :span="24">
@@ -43,6 +45,7 @@
                   type="text"
                   placeholder="Enter a reviewer address"
                 />
+                <span class="vuelidation-error" v-if="v$.reviewers.$error"> {{ v$.reviewers.$errors[0].$message }} </span>
               </el-form-item>
             </el-col>
             <el-col :span="24">
@@ -61,6 +64,7 @@
                   type="text"
                   placeholder="Enter a target address"
                 />
+                <span class="vuelidation-error" v-if="v$.targets.$error"> {{ v$.targets.$errors[0].$message }} </span>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -99,6 +103,7 @@
                   type="number"
                   placeholder="Enter the reward per review"
                 />
+                <span class="vuelidation-error" v-if="v$.rewardPerReview.$error"> {{ v$.rewardPerReview.$errors[0].$message }} </span>
               </el-form-item>
             </el-col>
           </el-row>
@@ -124,6 +129,8 @@ import { getReviewFormsTotal, createRequest } from "@/services/ContractService";
 import { useStore } from "vuex";
 import { reactive, computed, ref, watch, onBeforeMount } from "vue";
 import { ElNotification } from "element-plus";
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 
 export default {
   name: "CreateReviewRequest",
@@ -152,6 +159,37 @@ export default {
       rewardPerReview: "",
     });
 
+    const rules = computed(() => {
+      return {
+        name: {required},
+        reviewFormIndex: {required},
+        reviewers: requestObject.reviewers.reduce(
+          (total, _currentReviewer, index) => {
+            total = Object.assign(total, {
+              [index]: {
+                required
+              }
+            });
+
+            return total;
+          }, {}
+        ),
+        targets: requestObject.targets.reduce(
+          (total, _currentReviewer, index) => {
+            total = Object.assign(total, {
+              [index]: {
+                required
+              }
+            });
+
+            return total;
+          }, {}
+        ),
+        rewardPerReview: {required},
+      }
+    })
+    const v$ = useVuelidate(rules, requestObject)
+
     const addReviewer = () => {
       requestObject.reviewers.push("");
     };
@@ -170,62 +208,66 @@ export default {
     };
 
     const sendBtn = async () => {
-      dispatch("setLoading", true);
-      const rewardPerReviewToWei = web3.value.utils.toWei(
-        requestObject.rewardPerReview.toString(),
-        "ether"
-      );
-      const totalReward =
-        rewardPerReviewToWei *
-        requestObject.reviewers.length *
-        requestObject.targets.length;
-      const payload = {
-        name: requestObject.name,
-        reviewFormIndex: requestObject.reviewFormIndex,
-        targets: requestObject.targets,
-        targetHashes: requestObject.targetHashes,
-        reviewers: requestObject.reviewers,
-        requestHash: requestObject.requestHash,
-        rewardPerReview: rewardPerReviewToWei,
-        totalReward: totalReward,
-        contractAddress: DERESY_CONTRACT_ADDRESS,
-        walletAddress: walletAddress.value,
-      };
-
-      try {
-        await createRequest(web3.value, contract.value, payload);
-
-        ElNotification({
-          title: "Success",
-          message: "Successful transaction.",
-          type: "success",
-          duration: notificationTime,
-        });
-      } catch (e) {
-        if (e.code === 4001) {
+      console.log(v$)
+      v$.value.$validate()
+      if(!v$.value.$error){
+        dispatch("setLoading", true);
+        const rewardPerReviewToWei = web3.value.utils.toWei(
+          requestObject.rewardPerReview.toString(),
+          "ether"
+        );
+        const totalReward =
+          rewardPerReviewToWei *
+          requestObject.reviewers.length *
+          requestObject.targets.length;
+        const payload = {
+          name: requestObject.name,
+          reviewFormIndex: requestObject.reviewFormIndex,
+          targets: requestObject.targets,
+          targetHashes: requestObject.targetHashes,
+          reviewers: requestObject.reviewers,
+          requestHash: requestObject.requestHash,
+          rewardPerReview: rewardPerReviewToWei,
+          totalReward: totalReward,
+          contractAddress: DERESY_CONTRACT_ADDRESS,
+          walletAddress: walletAddress.value,
+        };
+  
+        try {
+          await createRequest(web3.value, contract.value, payload);
+  
           ElNotification({
-            title: "Error",
-            message: "Transaction cancelled.",
-            type: "error",
+            title: "Success",
+            message: "Successful transaction.",
+            type: "success",
             duration: notificationTime,
           });
-        } else if (e.code === -32603) {
-          ElNotification({
-            title: "Error",
-            message: "Error processing TX.",
-            type: "error",
-            duration: notificationTime,
-          });
-        } else {
-          ElNotification({
-            title: "Error",
-            message: `Transaction failed: ${e.message}`,
-            type: "error",
-            duration: notificationTime,
-          });
+        } catch (e) {
+          if (e.code === 4001) {
+            ElNotification({
+              title: "Error",
+              message: "Transaction cancelled.",
+              type: "error",
+              duration: notificationTime,
+            });
+          } else if (e.code === -32603) {
+            ElNotification({
+              title: "Error",
+              message: "Error processing TX.",
+              type: "error",
+              duration: notificationTime,
+            });
+          } else {
+            ElNotification({
+              title: "Error",
+              message: `Transaction failed: ${e.message}`,
+              type: "error",
+              duration: notificationTime,
+            });
+          }
         }
+        dispatch("setLoading", false);
       }
-      dispatch("setLoading", false);
     };
 
     onBeforeMount(async () => {
@@ -258,6 +300,7 @@ export default {
       deleteReviewer,
       deleteTarget,
       sendBtn,
+      v$,
     };
   },
 };
@@ -275,5 +318,12 @@ export default {
 .send-btn {
   margin: 10px 0px;
   float: left;
+}
+.vuelidation-error{
+  color: #dd0c0c;
+  font-size: 12px;
+  font-weight: bolder;
+  float: left;
+  margin-bottom: 5px;
 }
 </style>
