@@ -195,8 +195,7 @@ export const closeRequest = async (web3, contract, params) => {
 };
 
 export const submitReview = async (web3, contract, params) => {
-  const { name, targetIndex, answers, walletAddress, contractAddress } =
-    params;
+  const { name, targetIndex, answers, walletAddress, contractAddress } = params;
 
   const { methods } = contract;
 

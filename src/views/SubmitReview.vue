@@ -24,13 +24,24 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-button @click="getFormBtn()" class="send-btn" type="primary" style="margin-top:30px" :disabled="!requestName">
+              <el-button
+                @click="getFormBtn()"
+                class="send-btn"
+                type="primary"
+                style="margin-top: 30px"
+                :disabled="!requestName"
+              >
                 Get Form
               </el-button>
             </el-col>
           </el-row>
           <el-row :gutter="20" v-if="requestObject && reviewForm">
-            <div v-if="!requestObject.isClosed && requestObject.reviewers.includes(walletAddressRef)">
+            <div
+              v-if="
+                !requestObject.isClosed &&
+                requestObject.reviewers.includes(walletAddressRef)
+              "
+            >
               <el-col :span="24">
                 <el-form-item label="Target">
                   <el-select
@@ -49,17 +60,21 @@
                 </el-form-item>
               </el-col>
               <el-col :span="24" v-if="targetSelected()" class="targetHashDiv">
-                <span>Target IPFS Hash</span><br/>
+                <span>Target IPFS Hash</span><br />
                 <a
-                :href="`https://ipfs.io/ipfs/${requestObject.targetsIPFSHashes[reviewObject.targetIndex]}`"
-                style="text-decoration: none;margin-top:5px"
-                target="_blank"
+                  :href="`https://ipfs.io/ipfs/${
+                    requestObject.targetsIPFSHashes[reviewObject.targetIndex]
+                  }`"
+                  style="text-decoration: none; margin-top: 5px"
+                  target="_blank"
                 >
-                  {{ requestObject.targetsIPFSHashes[reviewObject.targetIndex] }}
+                  {{
+                    requestObject.targetsIPFSHashes[reviewObject.targetIndex]
+                  }}
                 </a>
-                <br/><br/>
+                <br /><br />
               </el-col>
-              <el-col 
+              <el-col
                 :span="24"
                 v-for="(question, index) in reviewForm[0]"
                 :key="index"
@@ -73,7 +88,7 @@
                     placeholder="Enter your answer"
                     required
                   />
-                  <el-radio-group 
+                  <el-radio-group
                     v-if="reviewForm[1][index] == '1'"
                     v-model="reviewObject.reviews[index]"
                     size="large"
@@ -81,13 +96,15 @@
                     <el-radio-button label="Yes" />
                     <el-radio-button label="No" />
                   </el-radio-group>
-                  <el-radio-group 
+                  <el-radio-group
                     v-if="reviewForm[1][index] == '2'"
                     v-model="reviewObject.reviews[index]"
                     size="large"
                   >
                     <el-radio-button
-                      v-for="(questionChoices, choiceIndex) in reviewForm[2][index]"
+                      v-for="(questionChoices, choiceIndex) in reviewForm[2][
+                        index
+                      ]"
                       :key="choiceIndex"
                       :label="questionChoices"
                     />
@@ -112,9 +129,7 @@
               <el-card class="error-card">
                 <template #header>
                   <div class="card-header">
-                    <span class="error-card-title"
-                      >Can't submit review</span
-                    >
+                    <span class="error-card-title">Can't submit review</span>
                   </div>
                 </template>
                 <div class="warning custom-block">
@@ -163,31 +178,36 @@ export default {
 
     const reviewObject = reactive({
       targetIndex: null,
-      reviews: []
+      reviews: [],
     });
 
     const forbiddenMessage = () => {
-      if(requestObject.value.isClosed) {
-        return 'This request is closed and does no longer accept reviews.'
-      } else if(!requestObject.value.reviewers.includes(walletAddressRef)){
-        return `Your address (${walletAddressRef.value}) is not authorized to submit a review for this request.`
+      if (requestObject.value.isClosed) {
+        return "This request is closed and does no longer accept reviews.";
+      } else if (!requestObject.value.reviewers.includes(walletAddressRef)) {
+        return `Your address (${walletAddressRef.value}) is not authorized to submit a review for this request.`;
       }
-    }
+    };
 
     const allowToSubmit = () => {
-      return requestName.value && reviewObject.targetIndex && reviewObject.reviews.length == reviewForm.value[0].length && !reviewObject.reviews.includes(undefined)
-    }
+      return (
+        requestName.value &&
+        reviewObject.targetIndex &&
+        reviewObject.reviews.length == reviewForm.value[0].length &&
+        !reviewObject.reviews.includes(undefined)
+      );
+    };
 
     const targetSelected = () => {
-      return reviewObject.targetIndex != null
-    }
+      return reviewObject.targetIndex != null;
+    };
 
     const onRequestSelection = () => {
-      reviewObject.reviews = []
-      reviewObject.targetIndex = null
-      requestObject.value = null
-      reviewForm.value = null
-    }
+      reviewObject.reviews = [];
+      reviewObject.targetIndex = null;
+      requestObject.value = null;
+      reviewForm.value = null;
+    };
 
     const getFormBtn = async () => {
       const requestPayload = {
@@ -293,21 +313,21 @@ export default {
   margin: 10px 0px;
   float: left;
 }
-.targetHashDiv{
+.targetHashDiv {
   font-size: 14px;
-  text-align:left;
+  text-align: left;
 }
-.error-card{
+.error-card {
   font-size: 15px;
   text-align: left;
 }
-.error-card-title{
+.error-card-title {
   font-size: 20px;
   font-weight: bold;
 }
 .custom-block.warning {
   padding: 8px 16px;
-  background-color: rgba(var(--el-color-danger-rgb), .1);;
+  background-color: rgba(var(--el-color-danger-rgb), 0.1);
   border-radius: 4px;
   border-left: 5px solid var(--el-color-danger);
   margin: 20px 0;
