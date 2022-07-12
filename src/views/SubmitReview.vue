@@ -109,6 +109,7 @@
                     />
                   </el-radio-group>
                 </el-form-item>
+                <span v-if="v$.reviews.$error"> {{ v$.reviews.$errors[0].$message }} </span>
               </el-col>
               <el-row v-if="reviewObject.requestName && reviewObject.targetIndex != null">
                 <el-col :span="24">
@@ -152,6 +153,8 @@ import {
 } from "@/services/ContractService";
 import { useStore } from "vuex";
 import { watch, computed, ref, onBeforeMount, reactive } from "vue";
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import { ElNotification } from "element-plus";
 export default {
   name: "SubmitReview",
@@ -178,6 +181,14 @@ export default {
       targetIndex: null,
       reviews: [],
     });
+
+    const rules = {
+      requestName: { required },
+      targetIndex: { required },
+      reviews: { required }
+    }
+
+    let v$ = useVuelidate(rules, reviewObject)
 
     const forbiddenMessage = () => {
       if (requestObject.value.isClosed) {
@@ -297,6 +308,7 @@ export default {
       onRequestSelection,
       getFormBtn,
       sendBtn,
+      v$,
     };
   },
 };

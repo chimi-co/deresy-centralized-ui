@@ -19,6 +19,8 @@
     "@kyvg/vue3-notification": "^2.3.4",
     "@metamask/detect-provider": "^1.2.0",
     "@portis/web3": "^4.0.5",
+    "@vuelidate/core": "^2.0.0-alpha.42",
+    "@vuelidate/validators": "^2.0.0-alpha.30",
     "axios": "^0.21.4",
     "configcat-js": "5.7.1",
     "core-js": "^3.6.5",
