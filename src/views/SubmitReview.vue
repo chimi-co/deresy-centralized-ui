@@ -82,7 +82,7 @@
                 <el-form-item :label="question">
                   <el-input
                     v-if="reviewForm[1][index] == '0'"
-                    style="margin-top: 5px; width:100%"
+                    style="margin-top: 5px; width: 100%"
                     v-model="reviewObject.reviews[index]"
                     type="text"
                     placeholder="Enter your answer"
@@ -109,9 +109,15 @@
                     />
                   </el-radio-group>
                 </el-form-item>
-                <span v-if="v$.reviews.$error"> {{ v$.reviews.$errors[0].$message }} </span>
+                <span v-if="v$.reviews.$error">
+                  {{ v$.reviews.$errors[0].$message }}
+                </span>
               </el-col>
-              <el-row v-if="reviewObject.requestName && reviewObject.targetIndex != null">
+              <el-row
+                v-if="
+                  reviewObject.requestName && reviewObject.targetIndex != null
+                "
+              >
                 <el-col :span="24">
                   <el-button
                     @click="sendBtn()"
@@ -153,8 +159,8 @@ import {
 } from "@/services/ContractService";
 import { useStore } from "vuex";
 import { watch, computed, ref, onBeforeMount, reactive } from "vue";
-import { useVuelidate } from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { useVuelidate } from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 import { ElNotification } from "element-plus";
 export default {
   name: "SubmitReview",
@@ -185,10 +191,10 @@ export default {
     const rules = {
       requestName: { required },
       targetIndex: { required },
-      reviews: { required }
-    }
+      reviews: { required },
+    };
 
-    let v$ = useVuelidate(rules, reviewObject)
+    let v$ = useVuelidate(rules, reviewObject);
 
     const forbiddenMessage = () => {
       if (requestObject.value.isClosed) {

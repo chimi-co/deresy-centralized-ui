@@ -5,7 +5,7 @@
         <el-form label-position="top">
           <h1>Create Review Request</h1>
           <el-row :gutter="20">
-            <el-row style="width:100%">
+            <el-row style="width: 100%">
               <el-col :span="24">
                 <el-form-item label="Name">
                   <el-input
@@ -14,11 +14,13 @@
                     type="text"
                     placeholder="Enter a name for the request"
                   />
-                  <span class="vuelidation-error" v-if="v$.name.$error"> {{ v$.name.$errors[0].$message }} </span>
+                  <span class="vuelidation-error" v-if="v$.name.$error">
+                    {{ v$.name.$errors[0].$message }}
+                  </span>
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row style="width:100%">
+            <el-row style="width: 100%">
               <el-col :span="24">
                 <el-form-item label="Review Form Index">
                   <el-select
@@ -34,11 +36,16 @@
                       :value="index"
                     />
                   </el-select>
-                  <span class="vuelidation-error" v-if="v$.reviewFormIndex.$error"> {{ v$.reviewFormIndex.$errors[0].$message }} </span>
+                  <span
+                    class="vuelidation-error"
+                    v-if="v$.reviewFormIndex.$error"
+                  >
+                    {{ v$.reviewFormIndex.$errors[0].$message }}
+                  </span>
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row style="width:100%; text-align:left">
+            <el-row style="width: 100%; text-align: left">
               <el-col :span="20">
                 <label class="el-form-item__label">Reviewers</label>
               </el-col>
@@ -46,19 +53,21 @@
             <div
               v-for="(reviewer, index) in requestObject.reviewers"
               :key="index"
-              style="width:100%"
+              style="width: 100%"
             >
               <el-row :gutter="20">
                 <el-col :span="22">
                   <el-input
-                    style="margin-top: 5px;"
+                    style="margin-top: 5px"
                     v-model="requestObject.reviewers[index].address"
                     label="Reviewer"
                     type="text"
                     placeholder="Enter a reviewer address"
                   />
                   <div v-if="v$.reviewers.$error" style="margin: 2% 0% 0% 0%">
-                    <span class="vuelidation-error"> {{ v$.reviewers.$errors[0].$message[index][0] }} </span>
+                    <span class="vuelidation-error">
+                      {{ v$.reviewers.$errors[0].$message[index][0] }}
+                    </span>
                   </div>
                 </el-col>
                 <el-col :span="1">
@@ -68,7 +77,7 @@
                     :icon="CloseBold"
                     size="small"
                     @click="removeReviewer(index)"
-                    style="margin-top:5px"
+                    style="margin-top: 5px"
                     v-if="index > 0"
                   ></el-button>
                 </el-col>
@@ -76,12 +85,17 @@
             </div>
             <el-row>
               <el-col :span="24">
-                <el-button @click="addReviewer()" class="add-btn" type="primary" style="margin: 10% 0%">
+                <el-button
+                  @click="addReviewer()"
+                  class="add-btn"
+                  type="primary"
+                  style="margin: 10% 0%"
+                >
                   Add Reviewer
                 </el-button>
               </el-col>
             </el-row>
-            <el-row style="width:100%; text-align: left;">
+            <el-row style="width: 100%; text-align: left">
               <el-col :span="12">
                 <label class="el-form-item__label">Targets</label>
               </el-col>
@@ -92,7 +106,7 @@
             <div
               v-for="(reviewer, index) in requestObject.targets"
               :key="index"
-              style="width:100%"
+              style="width: 100%"
             >
               <el-row :gutter="20">
                 <el-col :span="12">
@@ -104,7 +118,9 @@
                     placeholder="Enter a target address"
                   />
                   <div v-if="v$.targets.$error" style="margin: 2% 0% 0% 0%">
-                    <span class="vuelidation-error"> {{ v$.targets.$errors[0]?.$message[index][0] }} </span>
+                    <span class="vuelidation-error">
+                      {{ v$.targets.$errors[0]?.$message[index][0] }}
+                    </span>
                   </div>
                 </el-col>
                 <el-col :span="11">
@@ -123,7 +139,7 @@
                     :icon="CloseBold"
                     size="small"
                     @click="removeTarget(index)"
-                    style="margin-top:5px"
+                    style="margin-top: 5px"
                     v-if="index > 0"
                   ></el-button>
                 </el-col>
@@ -131,12 +147,17 @@
             </div>
             <el-row>
               <el-col :span="24">
-                <el-button @click="addTarget()" class="add-btn" type="primary" style="margin: 10% 0%">
+                <el-button
+                  @click="addTarget()"
+                  class="add-btn"
+                  type="primary"
+                  style="margin: 10% 0%"
+                >
                   Add Target
                 </el-button>
               </el-col>
             </el-row>
-            <el-row style="width:100%">
+            <el-row style="width: 100%">
               <el-col :span="24">
                 <el-form-item label="Request IPFS Hash">
                   <el-input
@@ -148,7 +169,7 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row style="width:100%">
+            <el-row style="width: 100%">
               <el-col :span="24">
                 <el-form-item label="Reward per review">
                   <el-input
@@ -157,7 +178,12 @@
                     type="number"
                     placeholder="Enter the rewards per review"
                   />
-                  <span class="vuelidation-error" v-if="v$.rewardPerReview.$error"> {{ v$.rewardPerReview.$errors[0].$message }} </span>
+                  <span
+                    class="vuelidation-error"
+                    v-if="v$.rewardPerReview.$error"
+                  >
+                    {{ v$.rewardPerReview.$errors[0].$message }}
+                  </span>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -185,8 +211,8 @@ import { getReviewFormsTotal, createRequest } from "@/services/ContractService";
 import { useStore } from "vuex";
 import { reactive, computed, ref, watch, onBeforeMount } from "vue";
 import { ElNotification } from "element-plus";
-import { useVuelidate } from '@vuelidate/core';
-import { required, helpers } from '@vuelidate/validators';
+import { useVuelidate } from "@vuelidate/core";
+import { required, helpers } from "@vuelidate/validators";
 
 export default {
   name: "CreateReviewRequest",
@@ -216,46 +242,46 @@ export default {
 
     const rules = computed(() => {
       return {
-        name: {required},
-        reviewFormIndex: {required},
+        name: { required },
+        reviewFormIndex: { required },
         targets: {
           $each: helpers.forEach({
             address: {
-              required
-            }
-          })
+              required,
+            },
+          }),
         },
         reviewers: {
           $each: helpers.forEach({
             address: {
-              required
-            }
-          })
+              required,
+            },
+          }),
         },
-        rewardPerReview: {required},
-      }
-    })
-    const v$ = useVuelidate(rules, requestObject)
+        rewardPerReview: { required },
+      };
+    });
+    const v$ = useVuelidate(rules, requestObject);
 
     const addReviewer = () => {
-      requestObject.reviewers.push({address:''});
+      requestObject.reviewers.push({ address: "" });
     };
 
     const addTarget = () => {
-      requestObject.targets.push({address:'', ipfsHash:''});
+      requestObject.targets.push({ address: "", ipfsHash: "" });
     };
 
     const removeReviewer = (index) => {
-      requestObject.reviewers.splice(index, 1)
+      requestObject.reviewers.splice(index, 1);
     };
 
     const removeTarget = (index) => {
-      requestObject.targets.splice(index, 1)
+      requestObject.targets.splice(index, 1);
     };
 
     const sendBtn = async () => {
-      v$.value.$validate()
-      if(!v$.value.$error){
+      v$.value.$validate();
+      if (!v$.value.$error) {
         dispatch("setLoading", true);
         const rewardPerReviewToWei = web3.value.utils.toWei(
           requestObject.rewardPerReview.toString(),
@@ -265,10 +291,16 @@ export default {
           rewardPerReviewToWei *
           requestObject.reviewers.length *
           requestObject.targets.length;
-        
-        const targetAddresses = requestObject.targets.map(target => { return target.address })
-        const targetHashes = requestObject.targets.map(target => { return target.ipfsHash })
-        const reviewersAddresses = requestObject.reviewers.map(reviewer => { return reviewer.address })
+
+        const targetAddresses = requestObject.targets.map((target) => {
+          return target.address;
+        });
+        const targetHashes = requestObject.targets.map((target) => {
+          return target.ipfsHash;
+        });
+        const reviewersAddresses = requestObject.reviewers.map((reviewer) => {
+          return reviewer.address;
+        });
 
         const payload = {
           name: requestObject.name,
@@ -282,10 +314,10 @@ export default {
           contractAddress: DERESY_CONTRACT_ADDRESS,
           walletAddress: walletAddress.value,
         };
-  
+
         try {
           await createRequest(web3.value, contract.value, payload);
-  
+
           ElNotification({
             title: "Success",
             message: "Successful transaction.",
@@ -321,8 +353,8 @@ export default {
     };
 
     onBeforeMount(async () => {
-      requestObject.reviewers.push({address: ""});
-      requestObject.targets.push({address: "", ipfsHash: ""});
+      requestObject.reviewers.push({ address: "" });
+      requestObject.targets.push({ address: "", ipfsHash: "" });
 
       if (contractRef.value) {
         const payload = {
@@ -369,7 +401,7 @@ export default {
   margin: 10px 0px;
   float: left;
 }
-.vuelidation-error{
+.vuelidation-error {
   color: #dd0c0c;
   font-size: 12px;
   font-weight: bolder;
