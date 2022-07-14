@@ -33,12 +33,13 @@
           class="send-btn"
           type="success"
           size="large"
+          :disabled="reviewFormIndex == null"
         >
           Send
         </el-button>
       </el-col>
     </el-row>
-    <el-row v-if="tableData?.length > 0">
+    <el-row v-if="tableData?.length > 0" style="margin: 5% 0%">
       <el-col :span="24">
         <el-table :data="tableData" border style="width: 100%">
           <el-table-column prop="question" label="Question" />

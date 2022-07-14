@@ -33,6 +33,7 @@
           class="send-btn"
           type="success"
           size="large"
+          :disabled="!requestName"
         >
           Send
         </el-button>

@@ -3,7 +3,7 @@
     <el-row>
       <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
         <el-form label-position="top">
-          <h1>Get Review Form</h1>
+          <h1>Get Review Request</h1>
           <el-row>
             <el-col :span="24">
               <el-form-item label="Review Request Name">
@@ -33,6 +33,7 @@
           class="send-btn"
           type="success"
           size="large"
+          :disabled="!requestName"
         >
           Send
         </el-button>
@@ -59,19 +60,21 @@
               <div class="review-body">
                 <span style="font-weight: bolder">Target</span><br />
                 <a
-                  :href="requestObject.targets[index]"
+                  :href="requestObject.targets[review.targetIndex]"
                   target="_blank"
                   style="text-decoration: none"
                 >
-                  {{ requestObject.targets[index] }} </a
+                  {{ requestObject.targets[review.targetIndex] }} </a
                 ><br /><br />
                 <span style="font-weight: bolder">Target IPFS Hash</span><br />
                 <a
-                  :href="`https://ipfs.io/ipfs/${requestObject.targetsIPFSHashes[index]}`"
+                  :href="`https://ipfs.io/ipfs/${
+                    requestObject.targetsIPFSHashes[review.targetIndex]
+                  }`"
                   target="_blank"
                   style="text-decoration: none"
                 >
-                  {{ requestObject.targetsIPFSHashes[index] }} </a
+                  {{ requestObject.targetsIPFSHashes[review.targetIndex] }} </a
                 ><br /><br /><br />
                 <div v-for="(question, index) in reviewForm[0]" :key="index">
                   <span style="font-weight: bolder">{{ question }}</span
