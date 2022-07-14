@@ -1,6 +1,9 @@
 <template>
   <el-col style="margin-top: 5px" :span="18">
-    <el-input v-model="choiceText" placeholder="Enter a question choice" />
+    <el-input
+      v-model="choiceObject.choiceText"
+      placeholder="Enter a question choice"
+    />
   </el-col>
   <el-col style="margin-top: 5px" :span="1">
     <el-button
@@ -23,14 +26,14 @@ export default {
   emits: ["deleteChoice", "update:modelValue"],
   props: {
     modelValue: {
-      type: String,
-      default: "",
+      type: Object,
+      default: () => ({ choiceText: "" }),
     },
   },
   setup(props, { emit }) {
     const instance = getCurrentInstance();
 
-    const choiceText = computed({
+    const choiceObject = computed({
       get: () => props.modelValue,
       set: (value) => emit("update:modelValue", value),
     });
@@ -44,7 +47,7 @@ export default {
     };
 
     return {
-      choiceText,
+      choiceObject,
       CloseBold,
       removeChoice,
       allowRemove,

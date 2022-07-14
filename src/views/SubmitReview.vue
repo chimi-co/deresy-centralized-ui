@@ -21,6 +21,9 @@
                     :value="requestNames[index]"
                   />
                 </el-select>
+                <span class="vuelidation-error" v-if="v$.requestName.$error">
+                  {{ v$.requestName.$errors[0].$message }}
+                </span>
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -57,6 +60,9 @@
                       :value="index"
                     />
                   </el-select>
+                  <span class="vuelidation-error" v-if="v$.targetIndex.$error">
+                    {{ v$.targetIndex.$errors[0].$message }}
+                  </span>
                 </el-form-item>
               </el-col>
               <el-col :span="24" v-if="targetSelected()" class="targetHashDiv">
@@ -83,13 +89,13 @@
                   <el-input
                     v-if="reviewForm[1][index] == '0'"
                     style="margin-top: 5px; width: 100%"
-                    v-model="reviewObject.reviews[index]"
+                    v-model="reviewObject.reviews[index].answer"
                     type="text"
                     placeholder="Enter your answer"
                   />
                   <el-radio-group
                     v-if="reviewForm[1][index] == '1'"
-                    v-model="reviewObject.reviews[index]"
+                    v-model="reviewObject.reviews[index].answer"
                     size="large"
                   >
                     <el-radio-button label="Yes" />
@@ -97,7 +103,7 @@
                   </el-radio-group>
                   <el-radio-group
                     v-if="reviewForm[1][index] == '2'"
-                    v-model="reviewObject.reviews[index]"
+                    v-model="reviewObject.reviews[index].answer"
                     size="large"
                   >
                     <el-radio-button
@@ -109,15 +115,13 @@
                     />
                   </el-radio-group>
                 </el-form-item>
-                <span v-if="v$.reviews.$error">
-                  {{ v$.reviews.$errors[0].$message }}
-                </span>
+                <el-row v-if="v$.reviews.$error" style="margin: 0% 0% 2% 0%">
+                  <el-col class="vuelidation-error">
+                    {{ v$.reviews.$errors[0].$message[index][0] }}
+                  </el-col>
+                </el-row>
               </el-col>
-              <el-row
-                v-if="
-                  reviewObject.requestName && reviewObject.targetIndex != null
-                "
-              >
+              <el-row v-if="reviewObject.requestName">
                 <el-col :span="24">
                   <el-button
                     @click="sendBtn()"
@@ -159,9 +163,9 @@ import {
 } from "@/services/ContractService";
 import { useStore } from "vuex";
 import { watch, computed, ref, onBeforeMount, reactive } from "vue";
-import { useVuelidate } from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
 import { ElNotification } from "element-plus";
+import { useVuelidate } from "@vuelidate/core";
+import { helpers, required } from "@vuelidate/validators";
 export default {
   name: "SubmitReview",
   setup() {
@@ -183,16 +187,24 @@ export default {
     const reviewForm = ref({});
 
     const reviewObject = reactive({
-      requestName: null,
+      requestName: "",
       targetIndex: null,
       reviews: [],
     });
 
-    const rules = {
-      requestName: { required },
-      targetIndex: { required },
-      reviews: { required },
-    };
+    const rules = computed(() => {
+      return {
+        requestName: { required },
+        targetIndex: { required },
+        reviews: {
+          $each: helpers.forEach({
+            answer: {
+              required,
+            },
+          }),
+        },
+      };
+    });
 
     let v$ = useVuelidate(rules, reviewObject);
 
@@ -218,7 +230,6 @@ export default {
     };
 
     const onRequestSelection = () => {
-      reviewObject.reviews = [];
       reviewObject.targetIndex = null;
       requestObject.value = null;
       reviewForm.value = null;
@@ -236,52 +247,65 @@ export default {
         contractMethods: contract.value.methods,
       };
       reviewForm.value = await getReviewForm(reviewFormPayload);
+
+      reviewObject.reviews = [];
+      for (let i = 0; i < reviewForm.value[0].length; i++) {
+        reviewObject.reviews.push({ answer: "" });
+      }
+      console.log(reviewObject);
     };
 
     const sendBtn = async () => {
-      dispatch("setLoading", true);
-      const payload = {
-        name: reviewObject.requestName,
-        targetIndex: reviewObject.targetIndex,
-        answers: reviewObject.reviews,
-        contractAddress: DERESY_CONTRACT_ADDRESS,
-        walletAddress: walletAddress.value,
-      };
-
-      try {
-        await submitReview(web3.value, contract.value, payload);
-
-        ElNotification({
-          title: "Success",
-          message: "Successful transaction.",
-          type: "success",
-          duration: notificationTime,
+      console.log(reviewObject);
+      v$.value.$validate();
+      if (!v$.value.$error) {
+        dispatch("setLoading", true);
+        const reviewsAnswers = reviewObject.reviews.map((review) => {
+          return review.answer;
         });
-      } catch (e) {
-        if (e.code === 4001) {
+        const payload = {
+          name: reviewObject.requestName,
+          targetIndex: reviewObject.targetIndex,
+          answers: reviewsAnswers,
+          contractAddress: DERESY_CONTRACT_ADDRESS,
+          walletAddress: walletAddress.value,
+        };
+
+        try {
+          await submitReview(web3.value, contract.value, payload);
+
           ElNotification({
-            title: "Error",
-            message: "Transaction cancelled.",
-            type: "error",
+            title: "Success",
+            message: "Successful transaction.",
+            type: "success",
             duration: notificationTime,
           });
-        } else if (e.code === -32603) {
-          ElNotification({
-            title: "Error",
-            message: "Error processing TX.",
-            type: "error",
-            duration: notificationTime,
-          });
-        } else {
-          ElNotification({
-            title: "Error",
-            message: `Transaction failed: ${e.message}`,
-            type: "error",
-            duration: notificationTime,
-          });
+        } catch (e) {
+          if (e.code === 4001) {
+            ElNotification({
+              title: "Error",
+              message: "Transaction cancelled.",
+              type: "error",
+              duration: notificationTime,
+            });
+          } else if (e.code === -32603) {
+            ElNotification({
+              title: "Error",
+              message: "Error processing TX.",
+              type: "error",
+              duration: notificationTime,
+            });
+          } else {
+            ElNotification({
+              title: "Error",
+              message: `Transaction failed: ${e.message}`,
+              type: "error",
+              duration: notificationTime,
+            });
+          }
         }
+        dispatch("setLoading", false);
       }
-      dispatch("setLoading", false);
     };
 
     onBeforeMount(async () => {
@@ -346,6 +370,14 @@ export default {
   border-radius: 4px;
   border-left: 5px solid var(--el-color-danger);
   margin: 20px 0;
+}
+.vuelidation-error {
+  color: #dd0c0c;
+  font-size: 12px;
+  font-weight: bolder;
+  float: left;
+  margin-bottom: 5px;
+  text-align: left;
 }
 </style>
 <style>

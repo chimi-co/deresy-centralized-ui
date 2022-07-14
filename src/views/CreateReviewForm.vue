@@ -46,6 +46,7 @@ import { createReviewForm } from "@/services/ContractService";
 import { useStore } from "vuex";
 import { reactive, onBeforeMount, computed } from "vue";
 import { ElNotification } from "element-plus";
+import { useVuelidate } from "@vuelidate/core";
 
 export default {
   name: "CreateReviewForm",
@@ -68,11 +69,13 @@ export default {
       formQuestions: [],
     });
 
+    const v = useVuelidate();
+
     const addQuestion = () => {
       formAccessibility.formQuestions.push({
         question: "",
         type: "",
-        choicesInputs: [],
+        choices: [],
       });
     };
 
@@ -81,62 +84,70 @@ export default {
     };
 
     const sendBtn = async () => {
-      dispatch("setLoading", true);
-      const payload = {
-        questions: [],
-        types: [],
-        choices: [],
-        contractAddress: DERESY_CONTRACT_ADDRESS,
-        walletAddress: walletAddress.value,
-      };
+      v.value.$validate();
+      if (!v.value.$error) {
+        dispatch("setLoading", true);
+        const payload = {
+          questions: [],
+          types: [],
+          choices: [],
+          contractAddress: DERESY_CONTRACT_ADDRESS,
+          walletAddress: walletAddress.value,
+        };
 
-      formAccessibility.formQuestions.forEach((formQuestion) => {
-        payload.questions.push(formQuestion.question);
-        payload.types.push(formQuestion.type);
-        payload.choices.push(formQuestion.choicesInputs);
-      });
-
-      try {
-        await createReviewForm(web3.value, contract.value, payload);
-
-        ElNotification({
-          title: "Success",
-          message: "Successful transaction.",
-          type: "success",
-          duration: notificationTime,
+        formAccessibility.formQuestions.forEach((formQuestion) => {
+          const choicesText = formQuestion.choices.map((choice) => {
+            return choice.choiceText;
+          });
+          payload.questions.push(formQuestion.question);
+          payload.types.push(formQuestion.type);
+          payload.choices.push(choicesText);
         });
-      } catch (e) {
-        if (e.code === 4001) {
+
+        console.log(payload);
+
+        try {
+          await createReviewForm(web3.value, contract.value, payload);
+
           ElNotification({
-            title: "Error",
-            message: "Transaction cancelled.",
-            type: "error",
+            title: "Success",
+            message: "Successful transaction.",
+            type: "success",
             duration: notificationTime,
           });
-        } else if (e.code === -32603) {
-          ElNotification({
-            title: "Error",
-            message: "Error processing TX.",
-            type: "error",
-            duration: notificationTime,
-          });
-        } else {
-          ElNotification({
-            title: "Error",
-            message: `Transaction failed: ${e.message}`,
-            type: "error",
-            duration: notificationTime,
-          });
+        } catch (e) {
+          if (e.code === 4001) {
+            ElNotification({
+              title: "Error",
+              message: "Transaction cancelled.",
+              type: "error",
+              duration: notificationTime,
+            });
+          } else if (e.code === -32603) {
+            ElNotification({
+              title: "Error",
+              message: "Error processing TX.",
+              type: "error",
+              duration: notificationTime,
+            });
+          } else {
+            ElNotification({
+              title: "Error",
+              message: `Transaction failed: ${e.message}`,
+              type: "error",
+              duration: notificationTime,
+            });
+          }
         }
+        dispatch("setLoading", false);
       }
-      dispatch("setLoading", false);
     };
 
     onBeforeMount(async () => {
       formAccessibility.formQuestions.push({
         question: "",
         type: "",
-        choicesInputs: [],
+        choices: [],
       });
     });
 
