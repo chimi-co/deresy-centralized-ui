@@ -104,8 +104,6 @@ export default {
           payload.choices.push(choicesText);
         });
 
-        console.log(payload);
-
         try {
           await createReviewForm(web3.value, contract.value, payload);
 

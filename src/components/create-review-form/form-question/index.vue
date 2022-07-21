@@ -143,7 +143,6 @@ export default {
 
     const onTypeSelection = () => {
       if (questionObject.value.type == 2) {
-        console.log(questionObject.value);
         isSingleChoice.value = true;
         questionObject.value.choices.push({ choiceText: "" });
         questionObject.value.choices.push({ choiceText: "" });

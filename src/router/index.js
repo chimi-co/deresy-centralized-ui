@@ -12,7 +12,7 @@ const routes = [
     component: () => import("@/views/Login"),
   },
   {
-    path: "/create-review-form",
+    path: "/create-review-form-only-admin-auth",
     component: () => import("@/views/CreateReviewForm"),
   },
   {
@@ -20,7 +20,7 @@ const routes = [
     component: () => import("@/views/GetReviewForm"),
   },
   {
-    path: "/create-review-request",
+    path: "/create-review-request-only-admin-auth",
     component: () => import("@/views/CreateReviewRequest"),
   },
   {
@@ -28,7 +28,7 @@ const routes = [
     component: () => import("@/views/GetReviewRequest"),
   },
   {
-    path: "/close-review-request",
+    path: "/close-review-request-only-admin-auth",
     component: () => import("@/views/CloseReviewRequest"),
   },
   {
