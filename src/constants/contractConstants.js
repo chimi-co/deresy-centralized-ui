@@ -1,6 +1,71 @@
 // ABI for the StudioUno contract (always replace for current version)
 export const DERESY_CONTRACT_ABI = [
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "string",
+        name: "_requestName",
+        type: "string",
+      },
+    ],
+    name: "ClosedReviewRequest",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_formId",
+        type: "uint256",
+      },
+    ],
+    name: "CreatedReviewForm",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "string",
+        name: "_requestName",
+        type: "string",
+      },
+    ],
+    name: "CreatedReviewRequest",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "string",
+        name: "_requestName",
+        type: "string",
+      },
+    ],
+    name: "SubmittedReview",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+    ],
+    name: "closeReviewRequest",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "contractVersion",
     outputs: [
@@ -11,50 +76,6 @@ export const DERESY_CONTRACT_ABI = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-    constant: true,
-  },
-  {
-    inputs: [],
-    name: "reviewFormsTotal",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-    constant: true,
-  },
-  {
-    inputs: [
-      {
-        internalType: "string[]",
-        name: "questions",
-        type: "string[]",
-      },
-      {
-        internalType: "string[][]",
-        name: "choices",
-        type: "string[][]",
-      },
-      {
-        internalType: "enum DeresyRequests.QuestionType[]",
-        name: "questionTypes",
-        type: "uint8[]",
-      },
-    ],
-    name: "createReviewForm",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -99,41 +120,33 @@ export const DERESY_CONTRACT_ABI = [
     outputs: [],
     stateMutability: "payable",
     type: "function",
-    payable: true,
   },
   {
     inputs: [
-      {
-        internalType: "string",
-        name: "_name",
-        type: "string",
-      },
-      {
-        internalType: "uint8",
-        name: "targetIndex",
-        type: "uint8",
-      },
       {
         internalType: "string[]",
-        name: "answers",
+        name: "questions",
         type: "string[]",
       },
-    ],
-    name: "submitReview",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
       {
-        internalType: "string",
-        name: "_name",
-        type: "string",
+        internalType: "string[][]",
+        name: "choices",
+        type: "string[][]",
+      },
+      {
+        internalType: "enum DeresyRequests.QuestionType[]",
+        name: "questionTypes",
+        type: "uint8[]",
       },
     ],
-    name: "closeReviewRequest",
-    outputs: [],
+    name: "createReviewForm",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -207,7 +220,6 @@ export const DERESY_CONTRACT_ABI = [
     ],
     stateMutability: "view",
     type: "function",
-    constant: true,
   },
   {
     inputs: [
@@ -237,7 +249,6 @@ export const DERESY_CONTRACT_ABI = [
     ],
     stateMutability: "view",
     type: "function",
-    constant: true,
   },
   {
     inputs: [],
@@ -251,7 +262,42 @@ export const DERESY_CONTRACT_ABI = [
     ],
     stateMutability: "view",
     type: "function",
-    constant: true,
+  },
+  {
+    inputs: [],
+    name: "reviewFormsTotal",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+      {
+        internalType: "uint8",
+        name: "targetIndex",
+        type: "uint8",
+      },
+      {
+        internalType: "string[]",
+        name: "answers",
+        type: "string[]",
+      },
+    ],
+    name: "submitReview",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
 ];
 

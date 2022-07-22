@@ -16,34 +16,16 @@
                 @select="handleSelect"
               >
                 <el-menu-item
-                  index="/create-review-form"
-                  @click="goToPath('/create-review-form')"
-                >
-                  Create Review Form
-                </el-menu-item>
-                <el-menu-item
                   index="/get-review-form"
                   @click="goToPath('/get-review-form')"
                 >
                   Get Review Form
                 </el-menu-item>
                 <el-menu-item
-                  index="/create-review-request"
-                  @click="goToPath('/create-review-request')"
-                >
-                  Create Review Request
-                </el-menu-item>
-                <el-menu-item
                   index="/get-review-request"
                   @click="goToPath('/get-review-request')"
                 >
                   Get Review Request
-                </el-menu-item>
-                <el-menu-item
-                  index="/close-review-request"
-                  @click="goToPath('/close-review-request')"
-                >
-                  Close Review Request
                 </el-menu-item>
                 <el-menu-item
                   index="/submit-review"
@@ -109,34 +91,16 @@
         @select="handleSelect"
       >
         <el-menu-item
-          index="/create-review-form"
-          @click="goToPath('/create-review-form')"
-        >
-          Create Review Form
-        </el-menu-item>
-        <el-menu-item
           index="/get-review-form"
           @click="goToPath('/get-review-form')"
         >
           Get Review Form
         </el-menu-item>
         <el-menu-item
-          index="/create-review-request"
-          @click="goToPath('/create-review-request')"
-        >
-          Create Review Request
-        </el-menu-item>
-        <el-menu-item
           index="/get-review-request"
           @click="goToPath('/get-review-request')"
         >
           Get Review Request
-        </el-menu-item>
-        <el-menu-item
-          index="/close-review-request"
-          @click="goToPath('/close-review-request')"
-        >
-          Close Review Request
         </el-menu-item>
         <el-menu-item
           index="/submit-review"

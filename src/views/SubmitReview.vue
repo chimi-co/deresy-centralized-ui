@@ -252,11 +252,9 @@ export default {
       for (let i = 0; i < reviewForm.value[0].length; i++) {
         reviewObject.reviews.push({ answer: "" });
       }
-      console.log(reviewObject);
     };
 
     const sendBtn = async () => {
-      console.log(reviewObject);
       v$.value.$validate();
       if (!v$.value.$error) {
         dispatch("setLoading", true);

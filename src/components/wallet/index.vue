@@ -154,7 +154,6 @@ export default {
 
     const onTogglePopup = () => {
       showPopup.value = !showPopup.value;
-      console.log(showPopup.value);
     };
 
     return {
