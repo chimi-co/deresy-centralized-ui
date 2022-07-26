@@ -16,12 +16,6 @@
                 @select="handleSelect"
               >
                 <el-menu-item
-                  index="/get-review-form"
-                  @click="goToPath('/get-review-form')"
-                >
-                  Get Review Form
-                </el-menu-item>
-                <el-menu-item
                   index="/get-review-request"
                   @click="goToPath('/get-review-request')"
                 >
@@ -90,12 +84,6 @@
         @close="handleClose"
         @select="handleSelect"
       >
-        <el-menu-item
-          index="/get-review-form"
-          @click="goToPath('/get-review-form')"
-        >
-          Get Review Form
-        </el-menu-item>
         <el-menu-item
           index="/get-review-request"
           @click="goToPath('/get-review-request')"

@@ -16,7 +16,7 @@ const routes = [
     component: () => import("@/views/CreateReviewForm"),
   },
   {
-    path: "/get-review-form",
+    path: "/get-review-form-only-admin-auth",
     component: () => import("@/views/GetReviewForm"),
   },
   {
@@ -34,6 +34,14 @@ const routes = [
   {
     path: "/submit-review",
     component: () => import("@/views/SubmitReview"),
+  },
+  {
+    path: "/grants",
+    component: () => import("@/views/Grants"),
+  },
+  {
+    path: "/grants/:grant_id",
+    component: () => import("@/views/Grant"),
   },
 ];
 
