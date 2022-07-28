@@ -24,7 +24,7 @@ const routes = [
     component: () => import("@/views/CreateReviewRequest"),
   },
   {
-    path: "/get-review-request",
+    path: "/get-review-request-only-admin-auth",
     component: () => import("@/views/GetReviewRequest"),
   },
   {
@@ -32,7 +32,7 @@ const routes = [
     component: () => import("@/views/CloseReviewRequest"),
   },
   {
-    path: "/submit-review",
+    path: "/submit-review-only-admin-auth",
     component: () => import("@/views/SubmitReview"),
   },
   {
@@ -42,6 +42,10 @@ const routes = [
   {
     path: "/grants/:grant_id",
     component: () => import("@/views/Grant"),
+  },
+  {
+    path: "/grants/:grant_id/submit-review/",
+    component: () => import("@/views/GrantSubmitReview"),
   },
 ];
 

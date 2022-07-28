@@ -1,6 +1,6 @@
 <template>
-  <div class="token-page-container">
-    <div v-if="!loading" class="main-container">
+  <div v-loading="loading">
+    <div v-if="!loading">
       <div v-if="!grantNotFound">
         <el-row>
           <el-col
@@ -37,13 +37,71 @@
         </el-row>
         <el-row>
           <el-col class="title-col">
-            <span class="title-text">
-              {{ state.grantData.title }}
-            </span>
+            <el-row>
+              <span class="title-text">
+                {{ state.grantData.title }}
+              </span>
+            </el-row>
+            <el-row style="margin-top: 20px">
+              <div v-if="state.reviews?.length > 0">
+                <div
+                  v-if="state.reviewRequest.isClosed"
+                  class="warning custom-block"
+                >
+                  This request is closed and does no longer accept reviews.
+                </div>
+                <div v-else style="display: inline-flex">
+                  <div
+                    v-if="state.reviewRequest.reviewers.includes(walletAddress)"
+                    style="display: inline-flex"
+                  >
+                    <el-button
+                      type="primary"
+                      class="d-round-btn"
+                      @click="goToSubmitReview()"
+                      round
+                      >Submit Review</el-button
+                    >
+                  </div>
+                  <div v-else class="warning custom-block">
+                    {{
+                      `Your address (${walletAddress}) is not authorized to submit a review for this request.`
+                    }}
+                  </div>
+                </div>
+                <el-button
+                  type="primary"
+                  class="d-round-btn"
+                  @click="scrollToReviews()"
+                  round
+                  >{{ `${state.reviews.length} reviews available`
+                  }}<el-icon class="el-icon--right"><ArrowDownBold /></el-icon
+                ></el-button>
+              </div>
+              <div v-else>
+                <div
+                  v-if="state.reviewRequest.isClosed"
+                  class="warning custom-block"
+                >
+                  This request is closed and does no longer accept reviews.
+                </div>
+                <div class="warning custom-block">
+                  No reviews available for this grant.
+                </div>
+              </div>
+              <a
+                target="_blank"
+                href="https://ipfs.io/ipfs/QmZpYTpqNwZr7RF9DB7YPXcMDiUJiD4iLNp9gLZaA2fEdh"
+              >
+                <el-button type="primary" class="d-round-btn" round>
+                  See Review Request (IPFS)
+                </el-button>
+              </a>
+            </el-row>
             <hr />
             <el-row class="grant-stats-row">
-              <el-col :span="12">
-                <div class="grant-stat">
+              <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <div class="grant-stat" v-if="state.grantData.reference_url">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <Pointer />
                   </el-icon>
@@ -55,7 +113,7 @@
                     {{ state.grantData.reference_url }}
                   </a>
                 </div>
-                <div class="grant-stat">
+                <div class="grant-stat" v-if="state.grantData.twitter_handle_1">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <Connection />
                   </el-icon>
@@ -67,15 +125,18 @@
                     {{ state.grantData.twitter_handle_1 }}
                   </a>
                 </div>
-                <div class="grant-stat">
+                <div
+                  class="grant-stat"
+                  v-if="state.grantData.last_update_natural"
+                >
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <Watch />
                   </el-icon>
                   {{ `Updated ${state.grantData.last_update_natural} ago` }}
                 </div>
               </el-col>
-              <el-col :span="12">
-                <div class="grant-stat">
+              <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                <div class="grant-stat" v-if="state.grantData.admin_address">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <Promotion />
                   </el-icon>
@@ -84,14 +145,37 @@
                     target="_blank"
                     class="grant-link"
                   >
-                    {{ state.grantData.admin_address }}
+                    {{ formatAddress(state.grantData.admin_address) }}
                   </a>
+                  <el-button
+                    class="copy-to-clipboard"
+                    @click="copyToClipboard(state.grantData.admin_address)"
+                    type="primary"
+                    size="small"
+                    round
+                  >
+                    <el-icon>
+                      <CopyDocument />
+                    </el-icon>
+                  </el-button>
                 </div>
-                <div class="grant-stat">
+                <div class="grant-stat" v-if="state.grantData.region.label">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <LocationFilled />
                   </el-icon>
                   {{ state.grantData.region.label }}
+                </div>
+                <div class="grant-stat" v-if="state.grantData.details_url">
+                  <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
+                    <Platform />
+                  </el-icon>
+                  <a
+                    :href="`https://gitcoin.co${state.grantData.details_url}`"
+                    target="_blank"
+                    class="grant-link"
+                  >
+                    Gitcoin page
+                  </a>
                 </div>
               </el-col>
             </el-row>
@@ -112,12 +196,25 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24">
+          <el-col :span="24" class="reviews-col" id="reviews-row">
             <el-col class="review-title-col">
               <span>Reviews</span>
+              <a
+                target="_blank"
+                href="https://ipfs.io/ipfs/QmZpYTpqNwZr7RF9DB7YPXcMDiUJiD4iLNp9gLZaA2fEdh"
+              >
+                <el-button
+                  type="primary"
+                  class="d-round-btn"
+                  style="margin-left: 30px !important"
+                  round
+                >
+                  See Reviews (IPFS)
+                </el-button>
+              </a>
             </el-col>
             <el-col class="reviews-cards-col">
-              <div v-if="state.reviews.length > 0">
+              <div v-if="state.reviews?.length > 0">
                 <el-card
                   v-for="(review, index) in state.reviews"
                   :key="index"
@@ -187,8 +284,8 @@
           sub-title="We're sorry, we couldn't find that grant, please try again."
         >
           <template #extra>
-            <el-link href="/" :underline="false">
-              <el-button type="primary">Back</el-button>
+            <el-link href="/grants" :underline="false">
+              <el-button type="primary" size="large">Explore Grants</el-button>
             </el-link>
           </template>
         </el-result>
@@ -198,12 +295,14 @@
 </template>
 
 <script>
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 import { getGrant } from "@/services/GrantService";
 import { getReviews } from "@/services/ReviewService";
 import { getReviewRequest } from "@/services/ReviewRequestService";
 import { getReviewForm } from "@/services/ReviewFormService";
-import { onBeforeMount, reactive, ref } from "vue";
+import { onBeforeMount, reactive, ref, computed } from "vue";
+import { useStore } from "vuex";
 import {
   FullScreen,
   Pointer,
@@ -211,6 +310,9 @@ import {
   Watch,
   Promotion,
   LocationFilled,
+  CopyDocument,
+  Platform,
+  ArrowDownBold,
 } from "@element-plus/icons";
 export default {
   name: "Grant",
@@ -221,60 +323,98 @@ export default {
     Watch,
     Promotion,
     LocationFilled,
+    CopyDocument,
+    Platform,
+    ArrowDownBold,
   },
   setup() {
-    //const store = useStore()
-    /*const {
-        dispatch,
-        state: { contractState, user, root },
-      } = store */
+    const store = useStore();
+    const {
+      state: { user },
+    } = store;
     const route = useRoute();
-    //const router = useRouter()
+    const router = useRouter();
     const grantID = route.params.grant_id;
     const aboutContent = ref("");
+    const walletAddress = computed(() => user.walletAddress);
     /*
-      const walletAddress = computed(() => user.walletAddress)
       const contract = computed(() => contractState.contract)
       const web3 = computed(() => contractState.web3)
       */
     const loading = ref(true);
-    const grantNotFound = ref(false);
+    const grantNotFound = ref(true);
     const state = reactive({
       grantData: {},
       reviewRequest: {},
       reviews: [],
       reviewForm: {},
     });
+    const scrollToReviews = () => {
+      document.querySelector("#reviews-row").scrollIntoView({
+        behavior: "smooth",
+      });
+    };
+
+    const goToSubmitReview = () => {
+      router.push({
+        path: `/grants/${grantID}/submit-review/`,
+      });
+    };
+
+    const copyToClipboard = async (text) => {
+      await navigator.clipboard.writeText(text);
+
+      ElMessage({
+        message: "Copied to Clipboard!",
+        type: "success",
+      });
+    };
+
+    const formatAddress = (address) => {
+      const length = address.length;
+      return `${address.substring(0, 6)}...${address.substring(
+        length - 5,
+        length - 1
+      )}`;
+    };
+
     onBeforeMount(async () => {
       const grantResponse = await getGrant(grantID);
-      state.grantData = grantResponse.response;
-      var QuillDeltaToHtmlConverter =
-        require("quill-delta-to-html").QuillDeltaToHtmlConverter;
-      const deltaOps = JSON.parse(state.grantData.description_rich).ops;
-      var converter = new QuillDeltaToHtmlConverter(deltaOps, {});
-      aboutContent.value = converter.convert();
+      if (grantResponse.response) {
+        grantNotFound.value = false;
+        state.grantData = grantResponse.response;
+        var QuillDeltaToHtmlConverter =
+          require("quill-delta-to-html").QuillDeltaToHtmlConverter;
+        const deltaOps = JSON.parse(state.grantData.description_rich).ops;
+        var converter = new QuillDeltaToHtmlConverter(deltaOps, {});
+        aboutContent.value = converter.convert();
 
-      const reviewRequestResponse = await getReviewRequest(
-        state.grantData.request_name
-      );
-      state.reviewRequest = reviewRequestResponse.response;
+        const reviewRequestResponse = await getReviewRequest(
+          state.grantData.request_name
+        );
+        state.reviewRequest = reviewRequestResponse.response;
 
-      const reviewsResponse = await getReviews(state.grantData.request_name);
-      state.reviews = reviewsResponse.response.reviews;
+        const reviewsResponse = await getReviews(state.grantData.request_name);
+        state.reviews = reviewsResponse.response?.reviews;
 
-      const reviewFormResponse = await getReviewForm(
-        state.reviewRequest.reviewFormIndex
-      );
-      state.reviewForm = reviewFormResponse.response;
-
+        const reviewFormResponse = await getReviewForm(
+          state.reviewRequest.reviewFormIndex
+        );
+        state.reviewForm = reviewFormResponse.response;
+      }
       loading.value = false;
     });
 
     return {
       loading,
+      walletAddress,
       grantNotFound,
       state,
       aboutContent,
+      goToSubmitReview,
+      scrollToReviews,
+      copyToClipboard,
+      formatAddress,
     };
   },
 };
@@ -351,13 +491,34 @@ hr {
   text-align: left;
   padding: 0% 10%;
 }
+.d-round-btn {
+  margin: 10px 30px 10px 0px;
+  display: inline-flex;
+}
+.custom-block.warning {
+  padding: 8px 16px;
+  background-color: rgba(var(--el-color-primary-rgb), 0.1);
+  border-radius: 4px;
+  border-left: 5px solid var(--el-color-primary);
+  margin: 10px 30px 10px 0px;
+  font-size: 14px;
+  display: inline-flex;
+}
 </style>
 <style>
 .el-table .cell {
   white-space: pre !important;
 }
-
 .ql-image {
-  max-width: 600px;
+  width: 100%;
+  height: auto;
+  margin: 2% 0;
+}
+.copy-to-clipboard {
+  cursor: pointer;
+  margin-left: 15px;
+}
+.reviews-col {
+  margin-bottom: 5%;
 }
 </style>
