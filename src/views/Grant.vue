@@ -91,7 +91,7 @@
               </div>
               <a
                 target="_blank"
-                href="https://ipfs.io/ipfs/QmZpYTpqNwZr7RF9DB7YPXcMDiUJiD4iLNp9gLZaA2fEdh"
+                href="https://gateway.ipfs.io/ipfs/QmdoRXg55kMSQxSCx3Y8PJcDRLByaUVKdEDAzAvFohzeZj/get_request.html"
               >
                 <el-button type="primary" class="d-round-btn" round>
                   See Review Request (IPFS)
@@ -201,7 +201,7 @@
               <span>Reviews</span>
               <a
                 target="_blank"
-                href="https://ipfs.io/ipfs/QmZpYTpqNwZr7RF9DB7YPXcMDiUJiD4iLNp9gLZaA2fEdh"
+                href="https://gateway.ipfs.io/ipfs/QmdoRXg55kMSQxSCx3Y8PJcDRLByaUVKdEDAzAvFohzeZj/get_request.html"
               >
                 <el-button
                   type="primary"
