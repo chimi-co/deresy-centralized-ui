@@ -6,6 +6,54 @@
     </el-col>
   </el-row>
   <hr />
+  <el-row
+    style="
+      padding: 5% 0;
+      background-color: #8c66f7;
+      color: white;
+      margin-top: -1px;
+    "
+  >
+    <el-col
+      :xs="24"
+      :sm="24"
+      :md="12"
+      :lg="12"
+      :xl="12"
+      style="padding: 0% 5% 0% 10%"
+    >
+      <h1>What is Gitcoinreviews.co?</h1>
+      <p>
+        Powered by Deresy, a <strong>DEcentralized REview SYstem</strong> on
+        Arbitrum, gitcoinreviews aims to bring users full transparency on how
+        gitcoin grants are performing and using their funds.
+      </p>
+    </el-col>
+    <el-col
+      :xs="24"
+      :sm="24"
+      :md="12"
+      :lg="12"
+      :xl="12"
+      style="padding: 0% 10% 0% 5%"
+    >
+      <img src="../assets/images/rocket-gitcoin.svg" />
+    </el-col>
+  </el-row>
+  <hr />
+  <el-row style="padding: 5% 0">
+    <el-col :span="24" style="padding: 0% 10%">
+      <h1>Available Grants</h1>
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="name" label="Grant" />
+        <el-table-column prop="funds" label="Funds raised" />
+        <el-table-column prop="reviews" label="Total reviews" />
+        <el-table-column prop="region" label="Region" />
+        <el-table-column prop="lastUpdated" label="Last updated" />
+      </el-table>
+    </el-col>
+  </el-row>
+  <hr />
   <el-row style="padding: 5% 0" v-loading="loading">
     <el-col
       v-for="(grant, index) in state.grantsData"
@@ -42,6 +90,7 @@
 <script>
 import { getAllGrants } from "@/services/GrantService";
 import { onBeforeMount, reactive, ref } from "vue";
+import { getAllReviews } from "@/services/ReviewService";
 export default {
   name: "Home",
   components: {},
@@ -50,14 +99,40 @@ export default {
     const state = reactive({
       grantsData: {},
     });
+    const tableData = ref([]);
 
     onBeforeMount(async () => {
       const grantsResponse = await getAllGrants();
       state.grantsData = grantsResponse.response;
+      state.grantsData.sort((a, b) =>
+        parseInt(a.amount_received) < parseInt(b.amount_received) ? 1 : -1
+      );
+      const reviews = await getAllReviews().then((res) => {
+        return res.response;
+      });
+      state.grantsData.forEach((grant) => {
+        const reviewObj = reviews.find(
+          (r) => r.requestName == grant.request_name
+        );
+        var formatter = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        });
+        const formattedAmount = formatter.format(grant.amount_received);
+        const grantObj = {
+          name: grant.title,
+          lastUpdated: grant.last_update_natural,
+          region: grant.region.label,
+          funds: formattedAmount,
+          reviews: reviewObj ? reviewObj.reviews?.length : 0,
+        };
+        tableData.value.push(grantObj);
+      });
       loading.value = false;
     });
 
     return {
+      tableData,
       loading,
       state,
     };
@@ -117,6 +192,6 @@ export default {
 }
 hr {
   border-top: 5px solid #6610f2;
-  margin: 0;
+  margin: 0px 0px 0px 0px !important;
 }
 </style>

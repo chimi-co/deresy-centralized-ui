@@ -18,3 +18,16 @@ export async function getReviews(requestName) {
 
   return { response, error };
 }
+
+export async function getAllReviews() {
+  let response;
+  let error;
+  try {
+    const snapshot = await reviewsRef.get();
+    response = snapshot.docs.map((doc) => doc.data());
+  } catch (e) {
+    error = e;
+  }
+
+  return { response, error };
+}
