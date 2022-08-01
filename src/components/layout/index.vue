@@ -15,23 +15,8 @@
                 @close="handleClose"
                 @select="handleSelect"
               >
-                <el-menu-item
-                  index="/get-review-form"
-                  @click="goToPath('/get-review-form')"
-                >
-                  Get Review Form
-                </el-menu-item>
-                <el-menu-item
-                  index="/get-review-request"
-                  @click="goToPath('/get-review-request')"
-                >
-                  Get Review Request
-                </el-menu-item>
-                <el-menu-item
-                  index="/submit-review"
-                  @click="goToPath('/submit-review')"
-                >
-                  Submit Review
+                <el-menu-item index="/grants" @click="goToPath('/grants')">
+                  Grants
                 </el-menu-item>
               </el-menu>
               <div class="wallet-container">
@@ -90,23 +75,8 @@
         @close="handleClose"
         @select="handleSelect"
       >
-        <el-menu-item
-          index="/get-review-form"
-          @click="goToPath('/get-review-form')"
-        >
-          Get Review Form
-        </el-menu-item>
-        <el-menu-item
-          index="/get-review-request"
-          @click="goToPath('/get-review-request')"
-        >
-          Get Review Request
-        </el-menu-item>
-        <el-menu-item
-          index="/submit-review"
-          @click="goToPath('/submit-review')"
-        >
-          Submit Review
+        <el-menu-item index="/grants" @click="goToPath('/grants')">
+          Grants
         </el-menu-item>
       </el-menu>
     </el-drawer>
@@ -185,6 +155,27 @@ body,
 html {
   margin: 0;
   overflow: hidden;
+  --el-menu-active-color: #6610f2;
+  --el-color-primary: #6610f2;
+  --el-color-primary-light-3: #813cef;
+  --el-color-primary-light-5: #b48cf5;
+  --el-color-primary-dark-2: #3d0497;
+}
+a {
+  text-decoration: none;
+  font-weight: bold;
+}
+a:link {
+  color: var(--el-color-primary);
+}
+a:visited {
+  color: var(--el-color-primary);
+}
+a:hover {
+  color: var(--el-color-primary);
+}
+a:active {
+  color: var(--el-color-primary);
 }
 
 .el-drawer__body {
@@ -206,12 +197,12 @@ html {
 
 .main {
   height: calc(100vh - 180px);
-  padding: 6px;
+  padding: 0;
 }
 
 .footer {
-  margin-top: 30px;
-  background: #d5ffff;
+  padding-top: 30px;
+  background: #efefef;
   height: 100%;
   font-size: 0.75em;
   display: flex;
