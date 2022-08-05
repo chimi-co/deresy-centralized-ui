@@ -72,7 +72,7 @@
                 <el-button
                   type="primary"
                   class="d-round-btn"
-                  @click="scrollToReviews()"
+                  @click="scrollToAbout()"
                   round
                   >See Project<el-icon class="el-icon--right"><ArrowDownBold /></el-icon
                 ></el-button>
@@ -251,7 +251,7 @@
         </el-row>
         <hr />
         <el-row>
-          <el-col class="grant-about-col" :span="24" id="reviews-row">
+          <el-col class="grant-about-col" :span="24" id="about-row">
             <el-row>
               <el-col class="grant-about-title">
                 <span>About</span>
@@ -336,8 +336,8 @@ export default {
       reviews: [],
       reviewForm: {},
     });
-    const scrollToReviews = () => {
-      document.querySelector("#reviews-row").scrollIntoView({
+    const scrollToAbout = () => {
+      document.querySelector("#about-row").scrollIntoView({
         behavior: "smooth",
       });
     };
@@ -399,7 +399,7 @@ export default {
       state,
       aboutContent,
       goToSubmitReview,
-      scrollToReviews,
+      scrollToAbout,
       copyToClipboard,
       formatAddress,
     };
