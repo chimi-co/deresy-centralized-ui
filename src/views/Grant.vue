@@ -72,10 +72,9 @@
                 <el-button
                   type="primary"
                   class="d-round-btn"
-                  @click="scrollToReviews()"
+                  @click="scrollToAbout()"
                   round
-                  >{{ `${state.reviews.length} reviews available`
-                  }}<el-icon class="el-icon--right"><ArrowDownBold /></el-icon
+                  >See Project<el-icon class="el-icon--right"><ArrowDownBold /></el-icon
                 ></el-button>
               </div>
               <div v-else>
@@ -180,10 +179,79 @@
               </el-col>
             </el-row>
             <hr />
+            <el-row>
+              <el-col :span="24" class="reviews-col">
+                <el-col class="review-title-col">
+                  <span>Reviews</span>
+                </el-col>
+                <el-col class="reviews-cards-col">
+                  <div v-if="state.reviews?.length > 0">
+                    <el-card
+                      v-for="(review, index) in state.reviews"
+                      :key="index"
+                      class="review-card"
+                      shadow="hover"
+                    >
+                      <template #header>
+                        <div class="card-header">
+                          <span class="review-title"
+                            >Review #{{ index + 1 }} by ({{
+                              review.reviewer
+                            }})</span
+                          >
+                        </div>
+                      </template>
+                      <div class="review-body">
+                        <span style="font-weight: bolder">Target</span><br />
+                        <a
+                          :href="state.reviewRequest.targets[review.targetIndex]"
+                          target="_blank"
+                          style="text-decoration: none"
+                        >
+                          {{ state.reviewRequest.targets[review.targetIndex] }} </a
+                        ><br /><br />
+                        <span style="font-weight: bolder">Target IPFS Hash</span
+                        ><br />
+                        <a
+                          :href="`https://ipfs.io/ipfs/${
+                            state.reviewRequest.targetsIPFSHashes[
+                              review.targetIndex
+                            ]
+                          }`"
+                          target="_blank"
+                          style="text-decoration: none"
+                        >
+                          {{
+                            state.reviewRequest.targetsIPFSHashes[
+                              review.targetIndex
+                            ]
+                          }} </a
+                        ><br /><br /><br />
+                        <div
+                          v-for="(question, index) in state.reviewForm.questions"
+                          :key="index"
+                        >
+                          <span style="font-weight: bolder">{{ question }}</span
+                          ><br />
+                          {{ review.answers[index] }}
+                          <br /><br />
+                        </div>
+                      </div>
+                    </el-card>
+                  </div>
+                  <div v-else>
+                    <el-card>
+                      There are no available reviews for this request yet.
+                    </el-card>
+                  </div>
+                </el-col>
+              </el-col>
+            </el-row>
           </el-col>
         </el-row>
+        <hr />
         <el-row>
-          <el-col class="grant-about-col" :span="24">
+          <el-col class="grant-about-col" :span="24" id="about-row">
             <el-row>
               <el-col class="grant-about-title">
                 <span>About</span>
@@ -193,87 +261,6 @@
               </el-col>
             </el-row>
             <hr />
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24" class="reviews-col" id="reviews-row">
-            <el-col class="review-title-col">
-              <span>Reviews</span>
-              <a
-                target="_blank"
-                href="https://gateway.ipfs.io/ipfs/QmdoRXg55kMSQxSCx3Y8PJcDRLByaUVKdEDAzAvFohzeZj/get_request.html"
-              >
-                <el-button
-                  type="primary"
-                  class="d-round-btn"
-                  style="margin-left: 30px !important"
-                  round
-                >
-                  See Reviews (IPFS)
-                </el-button>
-              </a>
-            </el-col>
-            <el-col class="reviews-cards-col">
-              <div v-if="state.reviews?.length > 0">
-                <el-card
-                  v-for="(review, index) in state.reviews"
-                  :key="index"
-                  class="review-card"
-                  shadow="hover"
-                >
-                  <template #header>
-                    <div class="card-header">
-                      <span class="review-title"
-                        >Review #{{ index + 1 }} by ({{
-                          review.reviewer
-                        }})</span
-                      >
-                    </div>
-                  </template>
-                  <div class="review-body">
-                    <span style="font-weight: bolder">Target</span><br />
-                    <a
-                      :href="state.reviewRequest.targets[review.targetIndex]"
-                      target="_blank"
-                      style="text-decoration: none"
-                    >
-                      {{ state.reviewRequest.targets[review.targetIndex] }} </a
-                    ><br /><br />
-                    <span style="font-weight: bolder">Target IPFS Hash</span
-                    ><br />
-                    <a
-                      :href="`https://ipfs.io/ipfs/${
-                        state.reviewRequest.targetsIPFSHashes[
-                          review.targetIndex
-                        ]
-                      }`"
-                      target="_blank"
-                      style="text-decoration: none"
-                    >
-                      {{
-                        state.reviewRequest.targetsIPFSHashes[
-                          review.targetIndex
-                        ]
-                      }} </a
-                    ><br /><br /><br />
-                    <div
-                      v-for="(question, index) in state.reviewForm.questions"
-                      :key="index"
-                    >
-                      <span style="font-weight: bolder">{{ question }}</span
-                      ><br />
-                      {{ review.answers[index] }}
-                      <br /><br />
-                    </div>
-                  </div>
-                </el-card>
-              </div>
-              <div v-else>
-                <el-card>
-                  There are no available reviews for this request yet.
-                </el-card>
-              </div>
-            </el-col>
           </el-col>
         </el-row>
       </div>
@@ -349,8 +336,8 @@ export default {
       reviews: [],
       reviewForm: {},
     });
-    const scrollToReviews = () => {
-      document.querySelector("#reviews-row").scrollIntoView({
+    const scrollToAbout = () => {
+      document.querySelector("#about-row").scrollIntoView({
         behavior: "smooth",
       });
     };
@@ -412,7 +399,7 @@ export default {
       state,
       aboutContent,
       goToSubmitReview,
-      scrollToReviews,
+      scrollToAbout,
       copyToClipboard,
       formatAddress,
     };
@@ -483,13 +470,13 @@ hr {
   text-align: left;
   font-weight: bold;
   font-size: 25px;
-  padding-left: 10%;
+  padding-left: 0%;
 }
 
 .reviews-cards-col {
   width: 100%;
   text-align: left;
-  padding: 0% 10%;
+  padding: 0% 0%;
 }
 .d-round-btn {
   margin: 10px 30px 10px 0px;
@@ -519,6 +506,6 @@ hr {
   margin-left: 15px;
 }
 .reviews-col {
-  margin-bottom: 5%;
+  margin: 5% 0;
 }
 </style>
