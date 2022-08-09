@@ -90,7 +90,7 @@
               </div>
               <a
                 target="_blank"
-                href="https://gateway.ipfs.io/ipfs/QmdoRXg55kMSQxSCx3Y8PJcDRLByaUVKdEDAzAvFohzeZj/get_request.html"
+                href="https://deresy.eth.limo/get_request.html"
               >
                 <el-button type="primary" class="d-round-btn" round>
                   See Review Request (IPFS)
