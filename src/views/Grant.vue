@@ -90,7 +90,7 @@
               </div>
               <a
                 target="_blank"
-                href="https://deresy.eth.limo/get_request.html"
+                :href="`${process.env.VUE_APP_IPFS_BASE_URL}/get_request.html`"
               >
                 <el-button type="primary" class="d-round-btn" round>
                   See Review Request (IPFS)
