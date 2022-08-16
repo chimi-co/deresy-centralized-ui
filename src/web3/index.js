@@ -1,9 +1,7 @@
 import Web3 from "web3";
 
-import { INFURA_MAINNET_BASE_URL } from "../constants/walletConstants";
-
 export const web3InfuraClient = () => {
-  const provider = `${INFURA_MAINNET_BASE_URL}/${process.env.VUE_APP_INFURA_API_KEY}`;
+  const provider = `${process.env.VUE_APP_INFURA_BASE_URL}/${process.env.VUE_APP_INFURA_API_KEY}`;
   return new Web3(provider);
 };
 
