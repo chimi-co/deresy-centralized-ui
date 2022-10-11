@@ -43,7 +43,7 @@
               </span>
             </el-row>
             <el-row style="margin-top: 20px">
-              <div v-if="state.reviews?.length > 0">
+              <div v-if="state.reviewRequest">
                 <div
                   v-if="state.reviewRequest.isClosed"
                   class="warning custom-block"
@@ -74,7 +74,8 @@
                   class="d-round-btn"
                   @click="scrollToAbout()"
                   round
-                  >See Project<el-icon class="el-icon--right"><ArrowDownBold /></el-icon
+                  >See Project<el-icon class="el-icon--right"
+                    ><ArrowDownBold /></el-icon
                 ></el-button>
               </div>
               <div v-else>
@@ -90,7 +91,7 @@
               </div>
               <a
                 target="_blank"
-                :href="`${process.env.VUE_APP_IPFS_BASE_URL}/get_request.html`"
+                :href="`${ipfsBaseUrl}/get_request.html`"
               >
                 <el-button type="primary" class="d-round-btn" round>
                   See Review Request (IPFS)
@@ -204,11 +205,15 @@
                       <div class="review-body">
                         <span style="font-weight: bolder">Target</span><br />
                         <a
-                          :href="state.reviewRequest.targets[review.targetIndex]"
+                          :href="
+                            state.reviewRequest.targets[review.targetIndex]
+                          "
                           target="_blank"
                           style="text-decoration: none"
                         >
-                          {{ state.reviewRequest.targets[review.targetIndex] }} </a
+                          {{
+                            state.reviewRequest.targets[review.targetIndex]
+                          }} </a
                         ><br /><br />
                         <span style="font-weight: bolder">Target IPFS Hash</span
                         ><br />
@@ -228,7 +233,8 @@
                           }} </a
                         ><br /><br /><br />
                         <div
-                          v-for="(question, index) in state.reviewForm.questions"
+                          v-for="(question, index) in state.reviewForm
+                            .questions"
                           :key="index"
                         >
                           <span style="font-weight: bolder">{{ question }}</span
@@ -324,6 +330,7 @@ export default {
     const grantID = route.params.grant_id;
     const aboutContent = ref("");
     const walletAddress = computed(() => user.walletAddress);
+    const ipfsBaseUrl = ref("")
     /*
       const contract = computed(() => contractState.contract)
       const web3 = computed(() => contractState.web3)
@@ -389,6 +396,7 @@ export default {
         );
         state.reviewForm = reviewFormResponse.response;
       }
+      ipfsBaseUrl.value = process.env.VUE_APP_IPFS_BASE_URL
       loading.value = false;
     });
 
@@ -398,6 +406,7 @@ export default {
       grantNotFound,
       state,
       aboutContent,
+      ipfsBaseUrl,
       goToSubmitReview,
       scrollToAbout,
       copyToClipboard,
