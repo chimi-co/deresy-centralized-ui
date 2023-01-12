@@ -89,10 +89,7 @@
                   No reviews available for this grant.
                 </div>
               </div>
-              <a
-                target="_blank"
-                :href="`${ipfsBaseUrl}/get_request.html`"
-              >
+              <a target="_blank" :href="`${ipfsBaseUrl}/get_request.html`">
                 <el-button type="primary" class="d-round-btn" round>
                   See Review Request (IPFS)
                 </el-button>
@@ -246,9 +243,11 @@
                     </el-card>
                   </div>
                   <div v-else>
-                    <el-card>
-                      There are no available reviews for this request yet.
-                    </el-card>
+                    <div style="margin-top: 30px">
+                      <el-card>
+                        There are no available reviews for this request yet.
+                      </el-card>
+                    </div>
                   </div>
                 </el-col>
               </el-col>
@@ -330,7 +329,7 @@ export default {
     const grantID = route.params.grant_id;
     const aboutContent = ref("");
     const walletAddress = computed(() => user.walletAddress);
-    const ipfsBaseUrl = ref("")
+    const ipfsBaseUrl = ref("");
     /*
       const contract = computed(() => contractState.contract)
       const web3 = computed(() => contractState.web3)
@@ -389,14 +388,18 @@ export default {
         state.reviewRequest = reviewRequestResponse.response;
 
         const reviewsResponse = await getReviews(state.grantData.request_name);
-        state.reviews = reviewsResponse.response?.reviews;
+        state.reviews = reviewsResponse.response?.reviews.filter(
+          (r) =>
+            r.targetIndex ==
+            state.reviewRequest.targets.indexOf(state.grantData.request_target)
+        );
 
         const reviewFormResponse = await getReviewForm(
           state.reviewRequest.reviewFormIndex
         );
         state.reviewForm = reviewFormResponse.response;
       }
-      ipfsBaseUrl.value = process.env.VUE_APP_IPFS_BASE_URL
+      ipfsBaseUrl.value = process.env.VUE_APP_IPFS_BASE_URL;
       loading.value = false;
     });
 
