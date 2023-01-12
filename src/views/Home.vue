@@ -91,6 +91,7 @@
 import { getAllGrants } from "@/services/GrantService";
 import { onBeforeMount, reactive, ref } from "vue";
 import { getAllReviews } from "@/services/ReviewService";
+import { getAllReviewRequests } from "@/services/ReviewRequestService";
 export default {
   name: "Home",
   components: {},
@@ -110,10 +111,16 @@ export default {
       const reviews = await getAllReviews().then((res) => {
         return res.response;
       });
+      const reviewRequests = await getAllReviewRequests().then((res) => {
+        return res.response;
+      });
       state.grantsData.forEach((grant) => {
         const reviewObj = reviews.find(
           (r) => r.requestName == grant.request_name
         );
+        const reviewRequest = reviewRequests.filter(
+          (rr) => rr.requestName == grant.request_name
+        )[0];
         var formatter = new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: "USD",
@@ -124,7 +131,13 @@ export default {
           lastUpdated: grant.last_update_natural,
           region: grant.region.label,
           funds: formattedAmount,
-          reviews: reviewObj ? reviewObj.reviews?.length : 0,
+          reviews: reviewObj
+            ? reviewObj.reviews?.filter(
+                (r) =>
+                  r.targetIndex ==
+                  reviewRequest.targets.indexOf(grant.request_target)
+              ).length
+            : 0,
         };
         tableData.value.push(grantObj);
       });
