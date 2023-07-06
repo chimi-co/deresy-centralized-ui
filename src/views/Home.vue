@@ -45,46 +45,37 @@
     <el-col :span="24" style="padding: 0% 10%">
       <h1>Available Grants</h1>
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="name" label="Grant" />
-        <el-table-column prop="funds" label="Funds raised" />
-        <el-table-column prop="reviews" label="Total reviews" />
-        <el-table-column prop="region" label="Region" />
-        <el-table-column prop="lastUpdated" label="Last updated" />
+        <el-table-column prop="name" sortable label="Grant">
+          <template #default="scope">
+            <a
+              :href="`/grants/${scope.row.id}`"
+              target="_blank"
+              class="grant-link">
+              <div class="grant-name-table-item">
+                <div>
+                  <el-avatar
+                    :src="scope.row.image"
+                    :size="40"
+                    :round="true"
+                  ></el-avatar>
+                </div>
+                <div class="table-grant-name">
+                  {{ scope.row.name }}
+                </div>
+              </div>
+            </a>
+          </template>
+        </el-table-column>
+        <el-table-column prop="funds" sortable label="Funds raised" />
+        <el-table-column prop="reviews" sortable label="Total reviews" />
+        <el-table-column prop="region" sortable label="Region" />
+        <el-table-column prop="lastUpdated" sortable label="Last updated">
+          
+        </el-table-column>
       </el-table>
     </el-col>
   </el-row>
   <hr />
-  <el-row style="padding: 5% 0" v-loading="loading">
-    <el-col
-      v-for="(grant, index) in state.grantsData"
-      :key="index"
-      :xs="24"
-      :sm="12"
-      :md="12"
-      :lg="8"
-      :xl="8"
-    >
-      <router-link
-        class="el-link el-link--default grant-link"
-        :to="`/grants/${grant.id}`"
-      >
-        <el-card
-          class="grant-card"
-          :body-style="{ padding: '10px' }"
-          shadow="hover"
-        >
-          <el-image
-            :src="grant.logo_url"
-            class="image grant-img"
-            fit="contain"
-          />
-          <div style="padding: 14px">
-            <span>{{ grant.title }}</span>
-          </div>
-        </el-card>
-      </router-link>
-    </el-col>
-  </el-row>
 </template>
 
 <script>
@@ -127,6 +118,8 @@ export default {
         });
         const formattedAmount = formatter.format(grant.amount_received);
         const grantObj = {
+          id: grant.id,
+          image: grant.logo_url,
           name: grant.title,
           lastUpdated: grant.last_update_natural,
           region: grant.region.label,
@@ -206,5 +199,18 @@ export default {
 hr {
   border-top: 5px solid #6610f2;
   margin: 0px 0px 0px 0px !important;
+}
+.grant-img{
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+}
+.grant-name-table-item{
+  display: flex;
+  align-items: center;
+}
+.table-grant-name{
+  margin-left: 10px;
+  color:#545454;
 }
 </style>
