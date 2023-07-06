@@ -4,6 +4,16 @@
       <span class="home-title">GITCOIN REVIEWS</span><br />
       <span class="home-subtitle">Explore public goods projects for web3</span>
     </el-col>
+    <el-col class="home-search">
+      <el-autocomplete
+        clearable
+        v-model="inputSearch"
+        :trigger-on-focus="false"
+        placeholder="Search Grant"
+        :fetch-suggestions="handleSearchGrants"
+        @select="handleSelectSuggestion"
+      />
+    </el-col>
   </el-row>
   <hr />
   <el-row
@@ -50,7 +60,8 @@
             <a
               :href="`/grants/${scope.row.id}`"
               target="_blank"
-              class="grant-link">
+              class="grant-link"
+            >
               <div class="grant-name-table-item">
                 <div>
                   <el-avatar
@@ -70,7 +81,6 @@
         <el-table-column prop="reviews" sortable label="Total reviews" />
         <el-table-column prop="region" sortable label="Region" />
         <el-table-column prop="lastUpdated" sortable label="Last updated">
-          
         </el-table-column>
       </el-table>
     </el-col>
@@ -79,44 +89,58 @@
 </template>
 
 <script>
+import { onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+
 import { getAllGrants } from "@/services/GrantService";
-import { onBeforeMount, reactive, ref } from "vue";
 import { getAllReviews } from "@/services/ReviewService";
 import { getAllReviewRequests } from "@/services/ReviewRequestService";
+
+import { debounce } from "lodash";
+
 export default {
   name: "Home",
   components: {},
   setup() {
+    const router = useRouter();
+
+    const grantsData = ref([]);
+    const inputSearch = ref("");
     const loading = ref(true);
-    const state = reactive({
-      grantsData: {},
-    });
+    const reviews = ref([]);
+    const reviewRequests = ref([]);
     const tableData = ref([]);
 
-    onBeforeMount(async () => {
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+
+    const fetchData = async () => {
       const grantsResponse = await getAllGrants();
-      state.grantsData = grantsResponse.response;
-      state.grantsData.sort((a, b) =>
-        parseInt(a.amount_received) < parseInt(b.amount_received) ? 1 : -1
-      );
-      const reviews = await getAllReviews().then((res) => {
-        return res.response;
-      });
-      const reviewRequests = await getAllReviewRequests().then((res) => {
-        return res.response;
-      });
-      state.grantsData.forEach((grant) => {
-        const reviewObj = reviews.find(
-          (r) => r.requestName == grant.request_name
+      grantsData.value = grantsResponse.response;
+
+      const { response: reviews } = await getAllReviews();
+      reviews.value = reviews;
+
+      const { response: reviewRequests } = await getAllReviewRequests();
+      reviewRequests.value = reviewRequests;
+    };
+
+    const amountFormatter = (amount) => {
+      return formatter.format(amount);
+    };
+
+    const formattingGrands = () => {
+      grantsData.value.forEach((grant) => {
+        const reviewObj = reviews.value.find(
+          (r) => r.requestName === grant.request_name
         );
-        const reviewRequest = reviewRequests.filter(
-          (rr) => rr.requestName == grant.request_name
+        const reviewRequest = reviewRequests.value.filter(
+          (rr) => rr.requestName === grant.request_name
         )[0];
-        var formatter = new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        });
-        const formattedAmount = formatter.format(grant.amount_received);
+
+        const formattedAmount = amountFormatter(grant.amount_received);
         const grantObj = {
           id: grant.id,
           image: grant.logo_url,
@@ -125,22 +149,51 @@ export default {
           region: grant.region.label,
           funds: formattedAmount,
           reviews: reviewObj
-            ? reviewObj.reviews?.filter(
-                (r) =>
-                  r.targetIndex ==
-                  reviewRequest.targets.indexOf(grant.request_target)
-              ).length
+            ? reviewObj.reviews.value?.filter(
+              (r) =>
+                r.targetIndex ===
+                reviewRequest.targets.indexOf(grant.request_target)
+            ).length
             : 0,
         };
         tableData.value.push(grantObj);
       });
+    };
+
+    const handleSearchGrants = debounce((text, callback) => {
+      const reduced = grantsData.value.reduce((filtered, grant) => {
+        if (grant.title.toLowerCase().includes(text.toLowerCase())) {
+          filtered.push({ id: grant.id, value: grant.title, });
+        }
+        return filtered;
+      }, []);
+
+      callback(reduced);
+    }, 500);
+
+    const handleSelectSuggestion = (grant) => {
+      router.push(`/grants/${grant.id}`)
+    };
+
+    onBeforeMount(async () => {
+      await fetchData();
+
+      grantsData.value.sort((a, b) =>
+        parseInt(a.amount_received) < parseInt(b.amount_received) ? 1 : -1
+      );
+
+      formattingGrands();
+
       loading.value = false;
     });
 
     return {
-      tableData,
       loading,
-      state,
+      grantsData,
+      inputSearch,
+      tableData,
+      handleSearchGrants,
+      handleSelectSuggestion,
     };
   },
 };
@@ -196,21 +249,24 @@ export default {
   position: relative;
   font-weight: bolder;
 }
+.home-search {
+  margin: 20px 0;
+}
 hr {
   border-top: 5px solid #6610f2;
   margin: 0px 0px 0px 0px !important;
 }
-.grant-img{
+.grant-img {
   width: 50px;
   height: 50px;
   background-size: cover;
 }
-.grant-name-table-item{
+.grant-name-table-item {
   display: flex;
   align-items: center;
 }
-.table-grant-name{
+.table-grant-name {
   margin-left: 10px;
-  color:#545454;
+  color: #545454;
 }
 </style>
