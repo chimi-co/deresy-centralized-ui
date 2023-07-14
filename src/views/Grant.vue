@@ -12,9 +12,8 @@
           >
             <el-image
               :src="state.grantData.logo_url"
-              class="image"
+              class="image grant-image"
               fit="contain"
-              style="width: 100%; height: 290px"
             >
               <template #error>
                 <div
@@ -234,9 +233,12 @@
                             .questions"
                           :key="index"
                         >
-                          <span style="font-weight: bolder">{{ question }}</span
-                          ><br />
-                          {{ review.answers[index] }}
+                          <span class="review-question">{{ question }}</span
+                          ><br /><br />
+                          <div
+                            class="answer-card"
+                            v-html="markdownToHtml(review.answers[index])"
+                          ></div>
                           <br /><br />
                         </div>
                       </div>
@@ -295,6 +297,7 @@ import { getReviewRequest } from "@/services/ReviewRequestService";
 import { getReviewForm } from "@/services/ReviewFormService";
 import { onBeforeMount, reactive, ref, computed } from "vue";
 import { useStore } from "vuex";
+import marked from "marked";
 import {
   FullScreen,
   Pointer,
@@ -371,6 +374,10 @@ export default {
       )}`;
     };
 
+    const markdownToHtml = (markdown) => {
+      return marked.parse(markdown);
+    };
+
     onBeforeMount(async () => {
       const grantResponse = await getGrant(grantID);
       if (grantResponse.response) {
@@ -410,6 +417,7 @@ export default {
       state,
       aboutContent,
       ipfsBaseUrl,
+      markdownToHtml,
       goToSubmitReview,
       scrollToAbout,
       copyToClipboard,
@@ -519,5 +527,19 @@ hr {
 }
 .reviews-col {
   margin: 5% 0;
+}
+.answer-card {
+  font-size: 14px;
+  padding: 5px 15px;
+  border: 1px solid #ddd;
+  box-shadow: 5px 3px 3px #ddd;
+}
+.grant-image {
+  width: 100%;
+  height: 290px;
+}
+.review-question {
+  font-weight: bolder;
+  font-size: 20px;
 }
 </style>
