@@ -77,7 +77,12 @@
             </a>
           </template>
         </el-table-column>
-        <el-table-column prop="funds" sortable label="Funds raised" />
+        <el-table-column
+          prop="funds"
+          sortable
+          :sort-method="sortFunds"
+          label="Funds raised"
+        />
         <el-table-column prop="reviews" sortable label="Total reviews" />
         <el-table-column prop="region" sortable label="Region" />
         <el-table-column prop="lastUpdated" sortable label="Last updated">
@@ -120,11 +125,11 @@ export default {
       const grantsResponse = await getAllGrants();
       grantsData.value = grantsResponse.response;
 
-      const { response: reviews } = await getAllReviews();
-      reviews.value = reviews;
+      const reviewsResponse = await getAllReviews();
+      reviews.value = reviewsResponse.response;
 
-      const { response: reviewRequests } = await getAllReviewRequests();
-      reviewRequests.value = reviewRequests;
+      const reviewRequestsResponse = await getAllReviewRequests();
+      reviewRequests.value = reviewRequestsResponse.response;
     };
 
     const amountFormatter = (amount) => {
@@ -149,11 +154,11 @@ export default {
           region: grant.region.label,
           funds: formattedAmount,
           reviews: reviewObj
-            ? reviewObj.reviews.value?.filter(
-              (r) =>
-                r.targetIndex ===
-                reviewRequest.targets.indexOf(grant.request_target)
-            ).length
+            ? reviewObj.reviews.filter(
+                (r) =>
+                  r.targetIndex ==
+                  reviewRequest.targets.indexOf(grant.request_target)
+              ).length
             : 0,
         };
         tableData.value.push(grantObj);
@@ -163,7 +168,7 @@ export default {
     const handleSearchGrants = debounce((text, callback) => {
       const reduced = grantsData.value.reduce((filtered, grant) => {
         if (grant.title.toLowerCase().includes(text.toLowerCase())) {
-          filtered.push({ id: grant.id, value: grant.title, });
+          filtered.push({ id: grant.id, value: grant.title });
         }
         return filtered;
       }, []);
@@ -172,7 +177,13 @@ export default {
     }, 500);
 
     const handleSelectSuggestion = (grant) => {
-      router.push(`/grants/${grant.id}`)
+      router.push(`/grants/${grant.id}`);
+    };
+
+    const sortFunds = () => {
+      tableData.value.sort((a, b) =>
+        parseInt(a.funds) < parseInt(b.funds) ? 1 : -1
+      );
     };
 
     onBeforeMount(async () => {
@@ -194,6 +205,7 @@ export default {
       tableData,
       handleSearchGrants,
       handleSelectSuggestion,
+      sortFunds,
     };
   },
 };

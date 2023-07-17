@@ -27,6 +27,7 @@
     "element-plus": "2.2.8",
     "firebase": "^8.8.0",
     "fortmatic": "^2.2.1",
+    "marked": "4.3.0",
     "quill-delta-to-html": "^0.12.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
