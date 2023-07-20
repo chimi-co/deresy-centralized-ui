@@ -1,17 +1,17 @@
 <template>
-  <div v-loading="loading">
+  <div class="grant-page" v-loading="loading">
     <div v-if="!loading">
       <div v-if="!grantNotFound">
         <el-row>
           <el-col
             :style="
-              state.grantData.image_css.length > 1
-                ? state.grantData.image_css
+              grant.image_css.length > 1
+                ? grant.image_css
                 : 'background-color:black; height:290px'
             "
           >
             <el-image
-              :src="state.grantData.logo_url"
+              :src="grant.logo_url"
               class="image grant-image"
               fit="contain"
             >
@@ -28,30 +28,40 @@
                   <el-icon :size="50" style="width: 3em; height: 3em">
                     <full-screen style="width: 5em; height: 5em" />
                   </el-icon>
-                  <br />Loading...
+                  Loading...
                 </div>
               </template>
             </el-image>
+          </el-col>
+        </el-row>
+
+        <el-row v-if="!!grant.summary">
+          <el-col class="title-col">
+            <el-row class="section__summary">
+              <div class="section__title">
+                <h3>Summary</h3>
+              </div>
+              <el-card class="section__content" shadow="hover">
+                {{ grant.summary }}
+              </el-card>
+            </el-row>
           </el-col>
         </el-row>
         <el-row>
           <el-col class="title-col">
             <el-row>
               <span class="title-text">
-                {{ state.grantData.title }}
+                {{ grant.title }}
               </span>
             </el-row>
             <el-row style="margin-top: 20px">
-              <div v-if="state.reviewRequest">
-                <div
-                  v-if="state.reviewRequest.isClosed"
-                  class="warning custom-block"
-                >
+              <div v-if="reviewRequest">
+                <div v-if="reviewRequest.isClosed" class="warning custom-block">
                   This request is closed and does no longer accept reviews.
                 </div>
                 <div v-else style="display: inline-flex">
                   <div
-                    v-if="state.reviewRequest.reviewers.includes(walletAddress)"
+                    v-if="reviewRequest.reviewers.includes(walletAddress)"
                     style="display: inline-flex"
                   >
                     <el-button
@@ -59,8 +69,9 @@
                       class="d-round-btn"
                       @click="goToSubmitReview()"
                       round
-                      >Submit Review</el-button
                     >
+                      Submit Review
+                    </el-button>
                   </div>
                   <div v-else class="warning custom-block">
                     {{
@@ -69,19 +80,19 @@
                   </div>
                 </div>
                 <el-button
-                  type="primary"
                   class="d-round-btn"
-                  @click="scrollToAbout()"
                   round
-                  >See Project<el-icon class="el-icon--right"
-                    ><ArrowDownBold /></el-icon
-                ></el-button>
+                  type="primary"
+                  @click="scrollToAbout()"
+                >
+                  See Project
+                  <el-icon class="el-icon--right">
+                    <ArrowDownBold />
+                  </el-icon>
+                </el-button>
               </div>
               <div v-else>
-                <div
-                  v-if="state.reviewRequest.isClosed"
-                  class="warning custom-block"
-                >
+                <div v-if="reviewRequest.isClosed" class="warning custom-block">
                   This request is closed and does no longer accept reviews.
                 </div>
                 <div class="warning custom-block">
@@ -97,55 +108,52 @@
             <hr />
             <el-row class="grant-stats-row">
               <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <div class="grant-stat" v-if="state.grantData.reference_url">
+                <div class="grant-stat" v-if="grant.reference_url">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <Pointer />
                   </el-icon>
                   <a
-                    :href="`${state.grantData.reference_url}`"
+                    :href="`${grant.reference_url}`"
                     target="_blank"
                     class="grant-link"
                   >
-                    {{ state.grantData.reference_url }}
+                    {{ grant.reference_url }}
                   </a>
                 </div>
-                <div class="grant-stat" v-if="state.grantData.twitter_handle_1">
+                <div class="grant-stat" v-if="grant.twitter_handle_1">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <Connection />
                   </el-icon>
                   <a
-                    :href="`https://twitter.com/${state.grantData.twitter_handle_1}`"
+                    :href="`https://twitter.com/${grant.twitter_handle_1}`"
                     target="_blank"
                     class="grant-link"
                   >
-                    {{ state.grantData.twitter_handle_1 }}
+                    {{ grant.twitter_handle_1 }}
                   </a>
                 </div>
-                <div
-                  class="grant-stat"
-                  v-if="state.grantData.last_update_natural"
-                >
+                <div class="grant-stat" v-if="grant.last_update_natural">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <Watch />
                   </el-icon>
-                  {{ `Updated ${state.grantData.last_update_natural} ago` }}
+                  {{ `Updated ${grant.last_update_natural} ago` }}
                 </div>
               </el-col>
               <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <div class="grant-stat" v-if="state.grantData.admin_address">
-                  <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
+                <div class="grant-stat" v-if="grant.admin_address">
+                  <el-icon size="small" color="#6610f2" class="grant-icon-sm">
                     <Promotion />
                   </el-icon>
                   <a
-                    :href="`https://etherscan.io/address/${state.grantData.admin_address}`"
+                    :href="`https://etherscan.io/address/${grant.admin_address}`"
                     target="_blank"
                     class="grant-link"
                   >
-                    {{ formatAddress(state.grantData.admin_address) }}
+                    {{ formatAddress(grant.admin_address) }}
                   </a>
                   <el-button
                     class="copy-to-clipboard"
-                    @click="copyToClipboard(state.grantData.admin_address)"
+                    @click="copyToClipboard(grant.admin_address)"
                     type="primary"
                     size="small"
                     round
@@ -155,18 +163,18 @@
                     </el-icon>
                   </el-button>
                 </div>
-                <div class="grant-stat" v-if="state.grantData.region.label">
+                <div class="grant-stat" v-if="grant.region.label">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <LocationFilled />
                   </el-icon>
-                  {{ state.grantData.region.label }}
+                  {{ grant.region.label }}
                 </div>
-                <div class="grant-stat" v-if="state.grantData.details_url">
+                <div class="grant-stat" v-if="grant.details_url">
                   <el-icon :size="small" color="#6610f2" class="grant-icon-sm">
                     <Platform />
                   </el-icon>
                   <a
-                    :href="`https://gitcoin.co${state.grantData.details_url}`"
+                    :href="`https://gitcoin.co${grant.details_url}`"
                     target="_blank"
                     class="grant-link"
                   >
@@ -176,15 +184,47 @@
               </el-col>
             </el-row>
             <hr />
+            <el-row class="section__review-scoring">
+              <div class="section__title">
+                <h3>Review Scoring</h3>
+              </div>
+              <el-card class="section__content" shadow="hover">
+                <el-table
+                  header-cell-class-name="header-summary"
+                  border
+                  :data="dataTable"
+                  :summary-method="getSummaries"
+                  show-summary
+                >
+                  <el-table-column
+                    align="right"
+                    prop="answer1"
+                    :label="reviewForm.questions[10]"
+                  />
+                  <el-table-column
+                    align="right"
+                    prop="answer2"
+                    :label="reviewForm.questions[11]"
+                  />
+                  <el-table-column
+                    align="right"
+                    prop="average"
+                    label="Average"
+                    width="100"
+                  />
+                </el-table>
+              </el-card>
+            </el-row>
+            <hr />
             <el-row>
               <el-col :span="24" class="reviews-col">
                 <el-col class="review-title-col">
                   <span>Reviews</span>
                 </el-col>
                 <el-col class="reviews-cards-col">
-                  <div v-if="state.reviews?.length > 0">
+                  <div v-if="reviews?.length > 0">
                     <el-card
-                      v-for="(review, index) in state.reviews"
+                      v-for="(review, index) in reviews"
                       :key="index"
                       class="review-card"
                       shadow="hover"
@@ -201,36 +241,27 @@
                       <div class="review-body">
                         <span style="font-weight: bolder">Target</span><br />
                         <a
-                          :href="
-                            state.reviewRequest.targets[review.targetIndex]
-                          "
+                          :href="reviewRequest.targets[review.targetIndex]"
                           target="_blank"
                           style="text-decoration: none"
                         >
-                          {{
-                            state.reviewRequest.targets[review.targetIndex]
-                          }} </a
+                          {{ reviewRequest.targets[review.targetIndex] }} </a
                         ><br /><br />
                         <span style="font-weight: bolder">Target IPFS Hash</span
                         ><br />
                         <a
                           :href="`https://ipfs.io/ipfs/${
-                            state.reviewRequest.targetsIPFSHashes[
-                              review.targetIndex
-                            ]
+                            reviewRequest.targetsIPFSHashes[review.targetIndex]
                           }`"
                           target="_blank"
                           style="text-decoration: none"
                         >
                           {{
-                            state.reviewRequest.targetsIPFSHashes[
-                              review.targetIndex
-                            ]
-                          }} </a
-                        ><br /><br /><br />
+                            reviewRequest.targetsIPFSHashes[review.targetIndex]
+                          }}
+                        </a>
                         <div
-                          v-for="(question, index) in state.reviewForm
-                            .questions"
+                          v-for="(question, index) in reviewForm.questions"
                           :key="index"
                         >
                           <span class="review-question">{{ question }}</span
@@ -289,15 +320,18 @@
 </template>
 
 <script>
+import marked from "marked";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import { onBeforeMount, reactive, ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { useStore } from "vuex";
+
 import { getGrant } from "@/services/GrantService";
 import { getReviews } from "@/services/ReviewService";
 import { getReviewRequest } from "@/services/ReviewRequestService";
 import { getReviewForm } from "@/services/ReviewFormService";
-import { onBeforeMount, reactive, ref, computed } from "vue";
-import { useStore } from "vuex";
-import marked from "marked";
+
+import { ElMessage } from "element-plus";
 import {
   FullScreen,
   Pointer,
@@ -309,6 +343,7 @@ import {
   Platform,
   ArrowDownBold,
 } from "@element-plus/icons";
+
 export default {
   name: "Grant",
   components: {
@@ -329,14 +364,17 @@ export default {
     } = store;
     const route = useRoute();
     const router = useRouter();
-    const grantID = route.params.grant_id;
+
     const aboutContent = ref("");
-    const walletAddress = computed(() => user.walletAddress);
+    const dataTable = ref([]);
+    const grantID = route.params.grant_id;
+    const grant = ref(null);
+    const reviewRequest = ref(null);
+    const reviews = ref([]);
+    const reviewForm = ref(null);
     const ipfsBaseUrl = ref("");
-    /*
-      const contract = computed(() => contractState.contract)
-      const web3 = computed(() => contractState.web3)
-      */
+    const walletAddress = computed(() => user.walletAddress);
+
     const loading = ref(true);
     const grantNotFound = ref(true);
     const state = reactive({
@@ -345,6 +383,7 @@ export default {
       reviews: [],
       reviewForm: {},
     });
+
     const scrollToAbout = () => {
       document.querySelector("#about-row").scrollIntoView({
         behavior: "smooth",
@@ -374,49 +413,108 @@ export default {
       )}`;
     };
 
-    const markdownToHtml = (markdown) => {
-      return marked.parse(markdown);
+    const fetchGrant = async () => {
+      grant.value = (await getGrant(grantID)).response;
+      const deltaOps = JSON.parse(grant.value.description_rich).ops;
+      const converter = new QuillDeltaToHtmlConverter(deltaOps, {});
+      aboutContent.value = converter.convert();
+    };
+
+    const fetchReviewRequest = async () => {
+      const reviewRequestResponse = await getReviewRequest(
+        grant.value.request_name
+      );
+      reviewRequest.value = reviewRequestResponse.response;
+    };
+
+    const fetchReviews = async () => {
+      const reviewsResponse = await getReviews(grant.value.request_name);
+      reviews.value = reviewsResponse.response?.reviews.filter(
+        (r) =>
+          Number(r.targetIndex) ===
+          reviewRequest.value.targets.indexOf(grant.value.request_target)
+      );
+    };
+
+    const fetchReviewForm = async () => {
+      const reviewFormResponse = await getReviewForm(
+        reviewRequest.value.reviewFormIndex
+      );
+      reviewForm.value = reviewFormResponse.response;
+    };
+
+    const getReviewScoring = () => {
+      dataTable.value = reviews.value.map((review, i) => {
+        const answer1Score = Number(review.answers[10]);
+        const answer2Score = Number(review.answers[11]);
+        const average = (answer1Score + answer2Score) / 2;
+
+        return {
+          index: i + 1,
+          answer1: answer1Score.toFixed(1),
+          answer2: answer2Score.toFixed(1),
+          average,
+        };
+      });
+    };
+
+    const getSummaries = (params) => {
+      const { columns, data } = params;
+      const sums = [];
+
+      columns.forEach((column, index) => {
+        const values = data.map((item) => Number(item[column.property]));
+
+        if (!values.every((value) => Number.isNaN(value))) {
+          const sum = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!Number.isNaN(value)) {
+              return prev + curr;
+            } else {
+              return prev;
+            }
+          }, 0);
+
+          sums[index] = (sum / values.length).toFixed(1);
+        } else {
+          sums[index] = "N/A";
+        }
+      });
+
+      return sums;
     };
 
     onBeforeMount(async () => {
-      const grantResponse = await getGrant(grantID);
-      if (grantResponse.response) {
+      await fetchGrant();
+
+      if (grant.value) {
         grantNotFound.value = false;
-        state.grantData = grantResponse.response;
-        var QuillDeltaToHtmlConverter =
-          require("quill-delta-to-html").QuillDeltaToHtmlConverter;
-        const deltaOps = JSON.parse(state.grantData.description_rich).ops;
-        var converter = new QuillDeltaToHtmlConverter(deltaOps, {});
-        aboutContent.value = converter.convert();
-
-        const reviewRequestResponse = await getReviewRequest(
-          state.grantData.request_name
-        );
-        state.reviewRequest = reviewRequestResponse.response;
-
-        const reviewsResponse = await getReviews(state.grantData.request_name);
-        state.reviews = reviewsResponse.response?.reviews.filter(
-          (r) =>
-            r.targetIndex ==
-            state.reviewRequest.targets.indexOf(state.grantData.request_target)
-        );
-
-        const reviewFormResponse = await getReviewForm(
-          state.reviewRequest.reviewFormIndex
-        );
-        state.reviewForm = reviewFormResponse.response;
+        await fetchReviewRequest();
+        await fetchReviews();
+        await fetchReviewForm();
+        getReviewScoring();
       }
       ipfsBaseUrl.value = process.env.VUE_APP_IPFS_BASE_URL;
       loading.value = false;
     });
 
+    const markdownToHtml = (markdown) => {
+      return marked.parse(markdown);
+    };
+
     return {
+      dataTable,
+      grant,
+      reviews,
+      reviewForm,
+      reviewRequest,
       loading,
       walletAddress,
       grantNotFound,
       state,
       aboutContent,
       ipfsBaseUrl,
+      getSummaries,
       markdownToHtml,
       goToSubmitReview,
       scrollToAbout,
@@ -426,7 +524,21 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
+.grant-page {
+  height: 100%;
+  .section {
+    &__title {
+      font-weight: bold;
+      width: 100%;
+    }
+    &__content {
+      font-size: 16px;
+      width: 100%;
+    }
+  }
+}
+
 .title-text {
   font-size: 25px;
   font-weight: bold;
@@ -513,8 +625,17 @@ hr {
 }
 </style>
 <style>
+.el-table .header-summary {
+  font-weight: bold;
+  color: black;
+  text-align: left !important;
+}
 .el-table .cell {
-  white-space: pre !important;
+  word-break: normal !important;
+}
+.el-table__footer .cell {
+  font-weight: bold;
+  color: black;
 }
 .ql-image {
   width: 100%;

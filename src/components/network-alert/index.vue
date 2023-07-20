@@ -40,3 +40,9 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+.connect-wallet-alert {
+  position: absolute;
+  z-index: 3000;
+}
+</style>
