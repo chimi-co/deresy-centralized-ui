@@ -125,11 +125,11 @@ export default {
       const grantsResponse = await getAllGrants();
       grantsData.value = grantsResponse.response;
 
-      const { response: reviews } = await getAllReviews();
-      reviews.value = reviews;
+      const reviewsResponse = await getAllReviews();
+      reviews.value = reviewsResponse.response;
 
-      const { response: reviewRequests } = await getAllReviewRequests();
-      reviewRequests.value = reviewRequests;
+      const reviewRequestsResponse = await getAllReviewRequests();
+      reviewRequests.value = reviewRequestsResponse.response;
     };
 
     const amountFormatter = (amount) => {
