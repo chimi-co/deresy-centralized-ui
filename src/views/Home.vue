@@ -4,6 +4,16 @@
       <span class="home-title">GITCOIN REVIEWS</span><br />
       <span class="home-subtitle">Explore public goods projects for web3</span>
     </el-col>
+    <el-col class="home-search">
+      <el-autocomplete
+        clearable
+        v-model="inputSearch"
+        :trigger-on-focus="false"
+        placeholder="Search Grant"
+        :fetch-suggestions="handleSearchGrants"
+        @select="handleSelectSuggestion"
+      />
+    </el-col>
   </el-row>
   <hr />
   <el-row
@@ -45,96 +55,157 @@
     <el-col :span="24" style="padding: 0% 10%">
       <h1>Available Grants</h1>
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="name" label="Grant" />
-        <el-table-column prop="funds" label="Funds raised" />
-        <el-table-column prop="reviews" label="Total reviews" />
-        <el-table-column prop="region" label="Region" />
-        <el-table-column prop="lastUpdated" label="Last updated" />
+        <el-table-column prop="name" sortable label="Grant">
+          <template #default="scope">
+            <a
+              :href="`/grants/${scope.row.id}`"
+              target="_blank"
+              class="grant-link"
+            >
+              <div class="grant-name-table-item">
+                <div>
+                  <el-avatar
+                    :src="scope.row.image"
+                    :size="40"
+                    :round="true"
+                  ></el-avatar>
+                </div>
+                <div class="table-grant-name">
+                  {{ scope.row.name }}
+                </div>
+              </div>
+            </a>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="funds"
+          sortable
+          :sort-method="sortFunds"
+          label="Funds raised"
+        />
+        <el-table-column prop="reviews" sortable label="Total reviews" />
+        <el-table-column prop="region" sortable label="Region" />
+        <el-table-column prop="lastUpdated" sortable label="Last updated">
+        </el-table-column>
       </el-table>
     </el-col>
   </el-row>
   <hr />
-  <el-row style="padding: 5% 0" v-loading="loading">
-    <el-col
-      v-for="(grant, index) in state.grantsData"
-      :key="index"
-      :xs="24"
-      :sm="12"
-      :md="12"
-      :lg="8"
-      :xl="8"
-    >
-      <router-link
-        class="el-link el-link--default grant-link"
-        :to="`/grants/${grant.id}`"
-      >
-        <el-card
-          class="grant-card"
-          :body-style="{ padding: '10px' }"
-          shadow="hover"
-        >
-          <el-image
-            :src="grant.logo_url"
-            class="image grant-img"
-            fit="contain"
-          />
-          <div style="padding: 14px">
-            <span>{{ grant.title }}</span>
-          </div>
-        </el-card>
-      </router-link>
-    </el-col>
-  </el-row>
 </template>
 
 <script>
+import { onBeforeMount, ref } from "vue";
+import { useRouter } from "vue-router";
+
 import { getAllGrants } from "@/services/GrantService";
-import { onBeforeMount, reactive, ref } from "vue";
 import { getAllReviews } from "@/services/ReviewService";
+import { getAllReviewRequests } from "@/services/ReviewRequestService";
+
+import { debounce } from "lodash";
+
 export default {
   name: "Home",
   components: {},
   setup() {
+    const router = useRouter();
+
+    const grantsData = ref([]);
+    const inputSearch = ref("");
     const loading = ref(true);
-    const state = reactive({
-      grantsData: {},
-    });
+    const reviews = ref([]);
+    const reviewRequests = ref([]);
     const tableData = ref([]);
 
-    onBeforeMount(async () => {
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+
+    const fetchData = async () => {
       const grantsResponse = await getAllGrants();
-      state.grantsData = grantsResponse.response;
-      state.grantsData.sort((a, b) =>
-        parseInt(a.amount_received) < parseInt(b.amount_received) ? 1 : -1
-      );
-      const reviews = await getAllReviews().then((res) => {
-        return res.response;
-      });
-      state.grantsData.forEach((grant) => {
-        const reviewObj = reviews.find(
-          (r) => r.requestName == grant.request_name
+      grantsData.value = grantsResponse.response;
+
+      const reviewsResponse = await getAllReviews();
+      reviews.value = reviewsResponse.response;
+
+      const reviewRequestsResponse = await getAllReviewRequests();
+      reviewRequests.value = reviewRequestsResponse.response;
+    };
+
+    const amountFormatter = (amount) => {
+      return formatter.format(amount);
+    };
+
+    const formattingGrands = () => {
+      grantsData.value.forEach((grant) => {
+        const reviewObj = reviews.value.find(
+          (r) => r.requestName === grant.request_name
         );
-        var formatter = new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        });
-        const formattedAmount = formatter.format(grant.amount_received);
+        const reviewRequest = reviewRequests.value.filter(
+          (rr) => rr.requestName === grant.request_name
+        )[0];
+
+        const formattedAmount = amountFormatter(grant.amount_received);
         const grantObj = {
+          id: grant.id,
+          image: grant.logo_url,
           name: grant.title,
           lastUpdated: grant.last_update_natural,
           region: grant.region.label,
           funds: formattedAmount,
-          reviews: reviewObj ? reviewObj.reviews?.length : 0,
+          reviews: reviewObj
+            ? reviewObj.reviews.filter(
+                (r) =>
+                  r.targetIndex ==
+                  reviewRequest.targets.indexOf(grant.request_target)
+              ).length
+            : 0,
         };
         tableData.value.push(grantObj);
       });
+    };
+
+    const handleSearchGrants = debounce((text, callback) => {
+      const reduced = grantsData.value.reduce((filtered, grant) => {
+        if (grant.title.toLowerCase().includes(text.toLowerCase())) {
+          filtered.push({ id: grant.id, value: grant.title });
+        }
+        return filtered;
+      }, []);
+
+      callback(reduced);
+    }, 500);
+
+    const handleSelectSuggestion = (grant) => {
+      router.push(`/grants/${grant.id}`);
+    };
+
+    const sortFunds = () => {
+      tableData.value.sort((a, b) =>
+        parseInt(a.funds) < parseInt(b.funds) ? 1 : -1
+      );
+    };
+
+    onBeforeMount(async () => {
+      await fetchData();
+
+      grantsData.value.sort((a, b) =>
+        parseInt(a.amount_received) < parseInt(b.amount_received) ? 1 : -1
+      );
+
+      formattingGrands();
+
       loading.value = false;
     });
 
     return {
-      tableData,
       loading,
-      state,
+      grantsData,
+      inputSearch,
+      tableData,
+      handleSearchGrants,
+      handleSelectSuggestion,
+      sortFunds,
     };
   },
 };
@@ -190,8 +261,24 @@ export default {
   position: relative;
   font-weight: bolder;
 }
+.home-search {
+  margin: 20px 0;
+}
 hr {
   border-top: 5px solid #6610f2;
   margin: 0px 0px 0px 0px !important;
+}
+.grant-img {
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+}
+.grant-name-table-item {
+  display: flex;
+  align-items: center;
+}
+.table-grant-name {
+  margin-left: 10px;
+  color: #545454;
 }
 </style>
