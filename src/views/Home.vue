@@ -80,8 +80,8 @@
         <el-table-column
           prop="funds"
           sortable
-          :sort-method="sortFunds"
           label="Funds raised"
+          :formatter="amountFormatter"
         />
         <el-table-column prop="reviews" sortable label="Total reviews" />
         <el-table-column prop="region" sortable label="Region" />
@@ -132,8 +132,8 @@ export default {
       reviewRequests.value = reviewRequestsResponse.response;
     };
 
-    const amountFormatter = (amount) => {
-      return formatter.format(amount);
+    const amountFormatter = (grant) => {
+      return formatter.format(grant.funds);
     };
 
     const formattingGrands = () => {
@@ -145,14 +145,14 @@ export default {
           (rr) => rr.requestName === grant.request_name
         )[0];
 
-        const formattedAmount = amountFormatter(grant.amount_received);
+        //const formattedAmount = amountFormatter(grant.amount_received);
         const grantObj = {
           id: grant.id,
           image: grant.logo_url,
           name: grant.title,
           lastUpdated: grant.last_update_natural,
           region: grant.region.label,
-          funds: formattedAmount,
+          funds: parseFloat(grant.amount_received),
           reviews: reviewObj
             ? reviewObj.reviews.filter(
                 (r) =>
@@ -180,17 +180,11 @@ export default {
       router.push(`/grants/${grant.id}`);
     };
 
-    const sortFunds = () => {
-      tableData.value.sort((a, b) =>
-        parseInt(a.funds) < parseInt(b.funds) ? 1 : -1
-      );
-    };
-
     onBeforeMount(async () => {
       await fetchData();
 
       grantsData.value.sort((a, b) =>
-        parseInt(a.amount_received) < parseInt(b.amount_received) ? 1 : -1
+        parseFloat(a.amount_received) < parseFloat(b.amount_received) ? 1 : -1
       );
 
       formattingGrands();
@@ -205,7 +199,7 @@ export default {
       tableData,
       handleSearchGrants,
       handleSelectSuggestion,
-      sortFunds,
+      amountFormatter,
     };
   },
 };
