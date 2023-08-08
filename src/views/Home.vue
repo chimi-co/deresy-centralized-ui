@@ -52,10 +52,10 @@
   </el-row>
   <hr />
   <el-row style="padding: 5% 0">
-    <el-col :span="24" style="padding: 0% 10%">
+    <div class="table-grant">
       <h1>Available Grants</h1>
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="name" sortable label="Grant">
+        <el-table-column prop="name" sortable label="Grant" min-width="200">
           <template #default="scope">
             <a
               :href="`/grants/${scope.row.id}`"
@@ -63,12 +63,8 @@
               class="grant-link"
             >
               <div class="grant-name-table-item">
-                <div>
-                  <el-avatar
-                    :src="scope.row.image"
-                    :size="40"
-                    :round="true"
-                  ></el-avatar>
+                <div class="table-grant-icon">
+                  <el-avatar :src="scope.row.image" :size="40" :round="true" />
                 </div>
                 <div class="table-grant-name">
                   {{ scope.row.name }}
@@ -83,12 +79,20 @@
           label="Funds raised"
           :formatter="amountFormatter"
         />
-        <el-table-column prop="reviews" sortable label="Total reviews" />
-        <el-table-column prop="region" sortable label="Region" />
-        <el-table-column prop="lastUpdated" sortable label="Last updated">
+        <el-table-column
+          prop="reviews"
+          sortable
+          label="Total reviews"
+        />
+        <el-table-column prop="region" sortable label="Region"  />
+        <el-table-column
+          prop="lastUpdated"
+          sortable
+          label="Last updated"
+        >
         </el-table-column>
       </el-table>
-    </el-col>
+    </div>
   </el-row>
   <hr />
 </template>
@@ -262,17 +266,32 @@ hr {
   border-top: 5px solid #6610f2;
   margin: 0px 0px 0px 0px !important;
 }
-.grant-img {
-  width: 50px;
-  height: 50px;
-  background-size: cover;
+
+.table-grant {
+  width: 100%;
+  padding: 0 10px;
 }
 .grant-name-table-item {
   display: flex;
   align-items: center;
 }
 .table-grant-name {
-  margin-left: 10px;
+  margin: 10px;
   color: #545454;
+}
+
+@media screen and (max-width: 768px) {
+  .grant-name-table-item {
+    display: block;
+  }
+  .table-grant-icon {
+    display: flex;
+    justify-content: center;
+  }
+  .table-grant-name {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+  }
 }
 </style>
