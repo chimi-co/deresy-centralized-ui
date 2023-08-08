@@ -78,17 +78,26 @@
           sortable
           label="Funds raised"
           :formatter="amountFormatter"
+          min-width="130"
         />
         <el-table-column
           prop="reviews"
           sortable
           label="Total reviews"
+          min-width="100"
         />
-        <el-table-column prop="region" sortable label="Region"  />
+        <el-table-column prop="score" sortable label="Score" min-width="100" />
+        <el-table-column
+          prop="region"
+          sortable
+          label="Region"
+          min-width="100"
+        />
         <el-table-column
           prop="lastUpdated"
           sortable
           label="Last updated"
+          min-width="100"
         >
         </el-table-column>
       </el-table>
@@ -149,7 +158,6 @@ export default {
           (rr) => rr.requestName === grant.request_name
         )[0];
 
-        //const formattedAmount = amountFormatter(grant.amount_received);
         const grantObj = {
           id: grant.id,
           image: grant.logo_url,
@@ -164,6 +172,7 @@ export default {
                   reviewRequest.targets.indexOf(grant.request_target)
               ).length
             : 0,
+          score: grant.score.toFixed(1),
         };
         tableData.value.push(grantObj);
       });
@@ -208,6 +217,12 @@ export default {
   },
 };
 </script>
+
+<style>
+.table-grant .el-table .cell {
+  word-break: normal !important;
+}
+</style>
 
 <style scoped>
 .header-row {
