@@ -116,6 +116,8 @@ import { getAllReviewRequests } from "@/services/ReviewRequestService";
 
 import { debounce } from "lodash";
 
+import { useStore } from "vuex";
+
 export default {
   name: "Home",
   components: {},
@@ -194,6 +196,12 @@ export default {
     };
 
     onBeforeMount(async () => {
+      const store = useStore();
+
+      const { dispatch } = store;
+
+      dispatch("showVersionNotification");
+
       await fetchData();
 
       grantsData.value.sort((a, b) =>
