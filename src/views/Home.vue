@@ -200,7 +200,9 @@ export default {
 
       const { dispatch } = store;
 
-      dispatch("showVersionNotification");
+      if (process.env.VUE_APP_SHOW_V2_NOTIFICATION === "true") {
+        dispatch("showVersionNotification");
+      }
 
       await fetchData();
 
